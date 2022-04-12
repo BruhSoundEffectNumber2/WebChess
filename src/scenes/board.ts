@@ -35,10 +35,11 @@ export class Board extends Scene {
             }
         }
 
-        this.pieces = new Array();
+        this.pieces = [];
 
         this.setupBoard();
 
+        // Add pieces to the scene
         this.pieces.forEach(piece => {
             this.add(piece);
         });
@@ -64,5 +65,37 @@ export class Board extends Scene {
         this.pieces.push(new Piece("pb", vec(5, 1)));
         this.pieces.push(new Piece("pb", vec(6, 1)));
         this.pieces.push(new Piece("pb", vec(7, 1)));
+
+        // White Pieces
+        this.pieces.push(new Piece("rw", vec(0, 7)));
+        this.pieces.push(new Piece("nw", vec(1, 7)));
+        this.pieces.push(new Piece("bw", vec(2, 7)));
+        this.pieces.push(new Piece("qw", vec(3, 7)));
+        this.pieces.push(new Piece("kw", vec(4, 7)));
+        this.pieces.push(new Piece("bw", vec(5, 7)));
+        this.pieces.push(new Piece("nw", vec(6, 7)));
+        this.pieces.push(new Piece("rw", vec(7, 7)));
+
+        // Pawns
+        this.pieces.push(new Piece("pw", vec(0, 6)));
+        this.pieces.push(new Piece("pw", vec(1, 6)));
+        this.pieces.push(new Piece("pw", vec(2, 6)));
+        this.pieces.push(new Piece("pw", vec(3, 6)));
+        this.pieces.push(new Piece("pw", vec(4, 6)));
+        this.pieces.push(new Piece("pw", vec(5, 6)));
+        this.pieces.push(new Piece("pw", vec(6, 6)));
+        this.pieces.push(new Piece("pw", vec(7, 6)));
+    }
+
+    getPieceAtPos(pos: Vector): Piece {
+        for (let i = 0; i < this.pieces.length; i++) {
+            const piece = this.pieces[i];
+            
+            if (piece.boardPos.equals(pos)) {
+                return this.pieces[i];
+            }
+        }
+
+        return undefined;
     }
 }

@@ -11,6 +11,8 @@ import nw from "./resources/images/pieces/NW.png";
 import nb from "./resources/images/pieces/NB.png";
 import pw from "./resources/images/pieces/PW.png";
 import pb from "./resources/images/pieces/PB.png";
+import rw from "./resources/images/pieces/RW.png";
+import rb from "./resources/images/pieces/RB.png";
 
 /**
  * Default global resource dictionary. This gets loaded immediately
@@ -27,7 +29,9 @@ const Resources = {
     NW: new ImageSource(nw),
     NB: new ImageSource(nb),
     PW: new ImageSource(pw),
-    PB: new ImageSource(pb)
+    PB: new ImageSource(pb),
+    RW: new ImageSource(rw),
+    RB: new ImageSource(rb)
 };
 
 export { Resources };
