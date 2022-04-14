@@ -4,7 +4,6 @@ import { Resources } from "../resources";
 export class Piece extends Actor {
     public type: string;
     public boardPos: Vector;
-    public light: boolean;
 
     constructor(type: string, boardPos: Vector) {
         super({
@@ -16,10 +15,15 @@ export class Piece extends Actor {
 
         this.type = type;
         this.boardPos = boardPos;
-        this.light == (type.charAt(1) == "w");
     }
 
     onInitialize(): void {
+        try {
+            let foo = Piece.getImage(this.type).toSprite();
+        } catch {
+            console.log(this.type);
+        }
+
         const sprite = Piece.getImage(this.type).toSprite();
         this.graphics.use(sprite);
     }
@@ -29,11 +33,16 @@ export class Piece extends Actor {
         this.pos = vec(newPos.x * 75 + 15, newPos.y * 75 + 15);
     }
 
+    isLight(): boolean {
+        return (this.type.charAt(1) == "w");
+    }
+
     /**
      * Gets the image for a chess piece.
      * @param type The type of piece.
      */
     static getImage(type: string): ImageSource {
+        // TODO: Maybe have a more elegant solution?
         switch (type) {
             case "kw": {
                 return Resources.KW;

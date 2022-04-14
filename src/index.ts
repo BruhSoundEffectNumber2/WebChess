@@ -1,11 +1,11 @@
 import { Engine, Loader, vec, Vector } from "excalibur";
 import { Piece } from "./actors/piece";
+import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
-
-class Game extends Engine {
+export class Game extends Engine {
     public board: Board;
-    public activePiece: Piece;
+    public chessInput: ChessInput;
 
     constructor() {
         super({ 
@@ -20,6 +20,7 @@ class Game extends Engine {
         loader.suppressPlayButton = true;
 
         this.board = new Board();
+        this.chessInput = new ChessInput();
         
         game.add("board", this.board);
 
@@ -34,16 +35,5 @@ game.start().then(() => {
 });
 
 game.input.pointers.primary.on("up", function(event) {
-    const boardPos = vec(Math.floor(event.worldPos.x / 75), Math.floor(event.worldPos.y / 75));
-    const piece = game.board.getPieceAtPos(boardPos);
-
-    if (game.activePiece) {
-        if (piece == undefined || piece.light != game.activePiece.light) {
-            game.activePiece.setBoardPos(boardPos);
-        } else {
-            game.activePiece = piece;
-        }
-    } else {
-        game.activePiece = piece;
-    }
+    game.chessInput.onChessAction(event);
 });
