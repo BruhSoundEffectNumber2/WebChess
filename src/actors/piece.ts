@@ -3,7 +3,6 @@ import { Resources } from "../resources";
 
 export class Piece extends Actor {
     public type: string;
-    public boardPos: Vector;
 
     constructor(type: string, boardPos: Vector) {
         super({
@@ -14,27 +13,11 @@ export class Piece extends Actor {
         });
 
         this.type = type;
-        this.boardPos = boardPos;
     }
 
     onInitialize(): void {
-        try {
-            let foo = Piece.getImage(this.type).toSprite();
-        } catch {
-            console.log(this.type);
-        }
-
         const sprite = Piece.getImage(this.type).toSprite();
         this.graphics.use(sprite);
-    }
-
-    setBoardPos(newPos: Vector): void {
-        this.boardPos == newPos;
-        this.pos = vec(newPos.x * 75 + 15, newPos.y * 75 + 15);
-    }
-
-    isLight(): boolean {
-        return (this.type.charAt(1) == "w");
     }
 
     /**

@@ -20,7 +20,7 @@ export class Game extends Engine {
         loader.suppressPlayButton = true;
 
         this.board = new Board();
-        this.chessInput = new ChessInput();
+        this.chessInput = new ChessInput(this);
         
         game.add("board", this.board);
 

@@ -57,9 +57,11 @@ export class Board extends Scene {
 
     resetActors(): void {
         // TODO: Object pooling, more efficient way of moving pieces
-        this.pieceActors.forEach((piece) => {
+        this.pieceActors.forEach(piece => {
             this.remove(piece);
         });
+
+        this.pieceActors = [];
 
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
@@ -72,7 +74,27 @@ export class Board extends Scene {
 
                 let actor = new Piece(type, vec(x, y));
                 this.add(actor);
+                this.pieceActors.push(actor);
             }
         }
+    }
+
+    getPieceType(pos: Vector): string {
+        return this.pieces[pos.y][pos.x];
+    }
+
+    movePiece(start: Vector, end: Vector): void {
+        // Make sure a piece is there to be moved
+        if (this.pieces[start.y][start.x] == "") {
+            return;
+        }
+
+        // TODO: Have logic for piece capturing
+        let pieceType = this.pieces[start.y][start.x];
+        
+        this.pieces[start.y][start.x] = "";
+        this.pieces[end.y][end.x] = pieceType;
+
+        this.resetActors();
     }
 }
