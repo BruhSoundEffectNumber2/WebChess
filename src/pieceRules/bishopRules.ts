@@ -17,7 +17,6 @@ export class BishopRules implements PieceRule {
         
         // Temp variables for possible moves
         let optionColor;
-        let optionType;
         let optionPos;
 
         // Moving up/right
