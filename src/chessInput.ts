@@ -1,5 +1,4 @@
-import { vec, Vector } from "excalibur";
-import { PointerEvent } from "excalibur/build/dist/Input";
+import { Input, vec, Vector } from "excalibur";
 import { Game } from ".";
 import { Piece } from "./actors/piece";
 import { Move } from "./move";
@@ -20,7 +19,7 @@ export class ChessInput {
         this.legalMoves = undefined;
     }
 
-    onChessAction(event: PointerEvent): void {
+    onChessAction(event: Input.PointerEvent): void {
         const eventPos = vec(Math.floor(event.worldPos.x / 75), Math.floor(event.worldPos.y / 75));
 
         if (this.activePiecePos && this.activePieceType) {
