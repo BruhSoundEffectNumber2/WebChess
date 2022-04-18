@@ -1,5 +1,4 @@
-import { Engine, Loader, vec, Vector } from "excalibur";
-import { Piece } from "./actors/piece";
+import { Engine, Loader } from "excalibur";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";

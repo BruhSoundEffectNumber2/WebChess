@@ -1,8 +1,11 @@
 import { Actor, Color, Engine, Rectangle, Scene, vec, Vector } from "excalibur";
+import { MoveLocation } from "../actors/moveLocation";
 import { Piece } from "../actors/piece";
+import { Move } from "../move";
 
 export class Board extends Scene {
     private pieceActors: Piece[];
+    private moveLocationActors: MoveLocation[];
     private pieces: string[][];
 
     onInitialize(_engine: Engine): void {
@@ -38,8 +41,9 @@ export class Board extends Scene {
 
         this.setupBoard();
         this.pieceActors = [];
+        this.moveLocationActors = [];
 
-        this.resetActors();
+        this.resetPieceActors();
     }
 
     setupBoard(): void {
@@ -55,7 +59,7 @@ export class Board extends Scene {
         ];
     }
 
-    resetActors(): void {
+    resetPieceActors(): void {
         // TODO: Object pooling, more efficient way of moving pieces
         this.pieceActors.forEach(piece => {
             this.remove(piece);
@@ -65,22 +69,52 @@ export class Board extends Scene {
 
         for (let y = 0; y < 8; y++) {
             for (let x = 0; x < 8; x++) {
-                let type = this.pieces[y][x];
+                const type = this.pieces[y][x];
 
                 // For when a space is not occupied by a piece
                 if (type == "") {
                     continue;
                 }
 
-                let actor = new Piece(type, vec(x, y));
+                const actor = new Piece(type, vec(x, y));
                 this.add(actor);
                 this.pieceActors.push(actor);
             }
         }
     }
 
+    resetMoveLocationActors(moves: Move[]): void {
+        this.moveLocationActors.forEach(actor => {
+            this.remove(actor);
+        });
+
+        this.moveLocationActors = [];
+
+        if (moves == undefined) {
+            return;
+        }
+
+        moves.forEach(move => {
+            const actor = new MoveLocation(move.end);
+            this.add(actor);
+            this.moveLocationActors.push(actor);
+        });
+    }
+
     getPieceType(pos: Vector): string {
         return this.pieces[pos.y][pos.x];
+    }
+
+    getPieceColor(pos: Vector): number {
+        const type = this.getPieceType(pos);
+        
+        if (type == "") {
+            return 0;
+        } else if (type.charAt(1) == "w") {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     movePiece(start: Vector, end: Vector): void {
@@ -90,11 +124,11 @@ export class Board extends Scene {
         }
 
         // TODO: Have logic for piece capturing
-        let pieceType = this.pieces[start.y][start.x];
+        const pieceType = this.pieces[start.y][start.x];
         
         this.pieces[start.y][start.x] = "";
         this.pieces[end.y][end.x] = pieceType;
-
-        this.resetActors();
+        
+        this.resetPieceActors();
     }
 }
