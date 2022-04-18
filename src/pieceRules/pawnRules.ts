@@ -7,11 +7,11 @@ export class PawnRules implements PieceRule {
     getLegalMoves(board: Board, pos: Vector): Move[] {
         // TODO: moving 2 spaces in first move/en passent
         
-        /*
-        * The pawn can move 1 space towards the other color,
-        * or one space diagonally towards the other color if an enemy
-        * piece is occupying it.
-        */
+        /**
+         * The pawn can move 1 space towards the other color,
+         * or one space diagonally towards the other color if an enemy
+         * piece is occupying it.
+         */
 
         const moves: Move[] = [];
 

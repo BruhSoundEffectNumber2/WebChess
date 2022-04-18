@@ -1,5 +1,6 @@
 import { Actor, ImageSource, vec, Vector } from "excalibur";
 import { Move } from "../move";
+import { BishopRules } from "../pieceRules/bishopRules";
 import { PawnRules } from "../pieceRules/pawnRules";
 import { Resources } from "../resources";
 import { Board } from "../scenes/board";
@@ -73,8 +74,13 @@ export class Piece extends Actor {
             return;
         }
 
+        let ruleObject;
+
         switch (type.charAt(0)) {
-            case "p": return new PawnRules().getLegalMoves(board, pos);
+            case "p": ruleObject = new PawnRules(); break;
+            case "b": ruleObject = new BishopRules(); break;
         }
+
+        return ruleObject.getLegalMoves(board, pos);
     }
 }
