@@ -1,6 +1,7 @@
 import { Actor, ImageSource, vec, Vector } from "excalibur";
 import { Move } from "../move";
 import { BishopRules } from "../pieceRules/bishopRules";
+import { KingRules } from "../pieceRules/kingRules";
 import { PawnRules } from "../pieceRules/pawnRules";
 import { QueenRules } from "../pieceRules/queenRules";
 import { RookRules } from "../pieceRules/rookRules";
@@ -83,6 +84,7 @@ export class Piece extends Actor {
             case "b": ruleObject = new BishopRules(); break;
             case "r": ruleObject = new RookRules(); break;
             case "q": ruleObject = new QueenRules(); break;
+            case "k": ruleObject = new KingRules(); break;
         }
 
         return ruleObject.getLegalMoves(board, pos);
