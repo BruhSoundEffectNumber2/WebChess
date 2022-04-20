@@ -2,13 +2,14 @@ import { Engine, Loader } from "excalibur";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
+import { State } from "./state";
 export class Game extends Engine {
     public board: Board;
     public chessInput: ChessInput;
 
     constructor() {
         super({ 
-            width: 600,
+            width: 800,
             height: 600
         });
     }
@@ -22,6 +23,7 @@ export class Game extends Engine {
         this.chessInput = new ChessInput(this);
         
         game.add("board", this.board);
+        State.initState(this.board);
 
         return super.start(loader);
     }

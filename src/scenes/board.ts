@@ -2,6 +2,7 @@ import { Actor, Color, Engine, Rectangle, Scene, vec, Vector } from "excalibur";
 import { MoveLocation } from "../actors/moveLocation";
 import { Piece } from "../actors/piece";
 import { Move } from "../move";
+import { State } from "../state";
 
 export class Board extends Scene {
     private pieceActors: Piece[];
@@ -38,6 +39,20 @@ export class Board extends Scene {
                 this.add(actor);
             }
         }
+
+        // Create the background for game information
+        const infoBGActor = new Actor({
+            width: 200,
+            height: 600,
+            anchor: Vector.Zero,
+            pos: vec(600, 0)
+        });
+        infoBGActor.graphics.use(new Rectangle({
+            color: Color.Black,
+            width: 200,
+            height: 600
+        }));
+        this.add(infoBGActor);
 
         this.setupBoard();
         this.pieceActors = [];
@@ -105,6 +120,7 @@ export class Board extends Scene {
         return this.pieces[pos.y][pos.x];
     }
 
+    // Gets color of piece at pos. 0: empty, 1: white, 2: black
     getPieceColor(pos: Vector): number {
         const type = this.getPieceType(pos);
         
@@ -130,5 +146,6 @@ export class Board extends Scene {
         this.pieces[end.y][end.x] = pieceType;
         
         this.resetPieceActors();
+        State.getState().turnMade();
     }
 }
