@@ -11,3 +11,13 @@ module.exports = merge(common, {
   },
   plugins: [new CompressionWebpackPlugin()],
 });
+
+const productionConfig = merge([
+  {
+    output: {
+
+      // Tweak this to match your GitHub project name
+      publicPath: "/WebChess/",
+    },
+  },
+]);
