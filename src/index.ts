@@ -9,7 +9,7 @@ export class Game extends Engine {
 
     constructor() {
         super({ 
-            width: 800,
+            width: 900,
             height: 600
         });
     }

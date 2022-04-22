@@ -42,14 +42,13 @@ export class Board extends Scene {
 
         // Create the background for game information
         const infoBGActor = new Actor({
-            width: 200,
-            height: 600,
             anchor: Vector.Zero,
             pos: vec(600, 0)
         });
+        
         infoBGActor.graphics.use(new Rectangle({
-            color: Color.Black,
-            width: 200,
+            color: Color.fromRGB(45, 45, 45),
+            width: 300,
             height: 600
         }));
         this.add(infoBGActor);
