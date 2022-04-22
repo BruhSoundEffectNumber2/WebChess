@@ -142,4 +142,30 @@ export class Board extends Scene {
         State.getState().turnMade();
         this.game.infoPanel.update();
     }
+
+    getKingPos(color: number): Vector {
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                let type = this.getPieceType(vec(x, y));
+
+                if (type.charAt(0) == "k") {
+                    
+                }
+            }
+        }
+    }
+
+    kingInCheck(): number {
+        let allLegalMoves: Move[];
+
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                allLegalMoves = allLegalMoves.concat(Piece.getLegalMoves(this, vec(x, y)));
+            }
+        }
+
+        allLegalMoves.forEach(move => {
+            if (move.end.equals())
+        });
+    }
 }
