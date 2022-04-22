@@ -1,4 +1,5 @@
 import { Engine, Loader } from "excalibur";
+import { InfoPanel } from "./actors/infoPanel";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
@@ -6,6 +7,7 @@ import { State } from "./state";
 export class Game extends Engine {
     public board: Board;
     public chessInput: ChessInput;
+    public infoPanel: InfoPanel;
 
     constructor() {
         super({ 
@@ -19,11 +21,13 @@ export class Game extends Engine {
         const loader = new Loader(Object.values(Resources));
         loader.suppressPlayButton = true;
 
-        this.board = new Board();
+        this.board = new Board(this);
         this.chessInput = new ChessInput(this);
         
         game.add("board", this.board);
         State.initState(this.board);
+
+        this.infoPanel = new InfoPanel(this.board);
 
         return super.start(loader);
     }

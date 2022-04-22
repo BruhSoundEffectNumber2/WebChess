@@ -28,28 +28,23 @@ export class ChessInput {
             return;
         }
 
-        if (this.activePiecePos && this.activePieceType) {
-            if (!this.activePiecePos.equals(eventPos)) {
-                const legalMoves: Move[] = this.legalMoves;
-                let madeMove = false;
+        if (this.activePiecePos && this.activePieceType && 
+            this.board.getPieceColor(eventPos) != this.board.getPieceColor(this.activePiecePos)) {
+            const legalMoves: Move[] = this.legalMoves;
+            let madeMove = false;
 
-                legalMoves.forEach(move => {
-                    // We can't use a usual break here, so have a flag for when we have made our move
-                    if (!madeMove && move.end.equals(eventPos)) {
-                        this.board.movePiece(this.activePiecePos, eventPos);
-                
-                        this.activePiecePos = undefined;
-                        this.activePieceType = "";
-                        this.legalMoves = undefined;
+            legalMoves.forEach(move => {
+                // We can't use a usual break here, so have a flag for when we have made our move
+                if (!madeMove && move.end.equals(eventPos)) {
+                    this.board.movePiece(this.activePiecePos, eventPos);
+            
+                    this.activePiecePos = undefined;
+                    this.activePieceType = "";
+                    this.legalMoves = undefined;
 
-                        madeMove = true;
-                    }
-                });
-            } else {
-                this.activePiecePos = undefined;
-                this.activePieceType = "";
-                this.legalMoves = undefined;
-            }
+                    madeMove = true;
+                }
+            });
         } else {
             const pieceType = this.board.getPieceType(eventPos);
 

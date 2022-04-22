@@ -1,4 +1,5 @@
 import { Actor, Color, Engine, Rectangle, Scene, vec, Vector } from "excalibur";
+import { Game } from "..";
 import { MoveLocation } from "../actors/moveLocation";
 import { Piece } from "../actors/piece";
 import { Move } from "../move";
@@ -8,6 +9,12 @@ export class Board extends Scene {
     private pieceActors: Piece[];
     private moveLocationActors: MoveLocation[];
     private pieces: string[][];
+    private game: Game;
+
+    constructor(game: Game) {
+        super();
+        this.game = game;
+    }
 
     onInitialize(_engine: Engine): void {
         // Rectangles for the board squares
@@ -39,19 +46,6 @@ export class Board extends Scene {
                 this.add(actor);
             }
         }
-
-        // Create the background for game information
-        const infoBGActor = new Actor({
-            anchor: Vector.Zero,
-            pos: vec(600, 0)
-        });
-        
-        infoBGActor.graphics.use(new Rectangle({
-            color: Color.fromRGB(45, 45, 45),
-            width: 300,
-            height: 600
-        }));
-        this.add(infoBGActor);
 
         this.setupBoard();
         this.pieceActors = [];
@@ -146,5 +140,6 @@ export class Board extends Scene {
         
         this.resetPieceActors();
         State.getState().turnMade();
+        this.game.infoPanel.update();
     }
 }
