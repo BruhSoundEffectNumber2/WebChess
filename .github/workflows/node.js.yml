@@ -20,17 +20,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: CI
+    - name: CI/CD
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - run: npm ci
     - run: npm test
-
-    - name: CD
-      with: 
-        node-version: ${{ matrix.node-version }}
-        token: ${{ secrets.GITHUB_TOKEN}}
     - run: npm run build:dev
     - run: npm run deploy
