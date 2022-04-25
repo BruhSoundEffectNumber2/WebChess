@@ -20,16 +20,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: CI
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - run: git config user.name "GitHub Actions Bot"
-    - run: git config user.email "<>"
 
     - run: npm ci
     - run: npm test
+
+    - name: CD
+      with: 
+        node-version: ${{ matrix.node-version }}
+        token: ${{ secrets.GITHUB_TOKEN}}
     - run: npm run build:dev
     - run: npm run deploy
