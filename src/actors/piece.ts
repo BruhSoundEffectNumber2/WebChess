@@ -68,6 +68,9 @@ export class Piece extends Actor {
                 return Resources.RB;
             }
         }
+
+        // TODO: better error handling for this function
+        return new ImageSource("");
     }
 
     // Gets the possible legal moves a piece can make
@@ -75,7 +78,7 @@ export class Piece extends Actor {
         const type = board.getPieceType(pos);        
 
         if (type == "") {
-            return;
+            return [];
         }
 
         let ruleObject;

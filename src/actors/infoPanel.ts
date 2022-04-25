@@ -48,6 +48,10 @@ export class InfoPanel {
     }
 
     update() {
-        this.stateText.text = "It is " + (this.state.playerTurn == 1 ? "White's" : "Black's") + " turn.";
+        if (this.state.check != 0) {
+            this.stateText.text = (this.state.check == 1 ? "White" : "Black") + " is in check.";
+        } else {
+            this.stateText.text = "It is " + (this.state.playerTurn == 1 ? "White's" : "Black's") + " turn.";
+        }
     }
 }

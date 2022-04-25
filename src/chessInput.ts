@@ -17,7 +17,7 @@ export class ChessInput {
     constructor(game: Game) {
         this.game = game;
         this.board = game.board;
-        this.legalMoves = undefined;
+        this.legalMoves = [];
     }
 
     onChessAction(event: Input.PointerEvent): void {
@@ -28,7 +28,7 @@ export class ChessInput {
             return;
         }
 
-        if (this.activePiecePos && this.activePieceType && 
+        if (this.activePiecePos != vec(-1, -1) && this.activePieceType && 
             this.board.getPieceColor(eventPos) != this.board.getPieceColor(this.activePiecePos)) {
             const legalMoves: Move[] = this.legalMoves;
             let madeMove = false;
@@ -38,9 +38,9 @@ export class ChessInput {
                 if (!madeMove && move.end.equals(eventPos)) {
                     this.board.movePiece(this.activePiecePos, eventPos);
             
-                    this.activePiecePos = undefined;
+                    this.activePiecePos = vec(-1, -1);
                     this.activePieceType = "";
-                    this.legalMoves = undefined;
+                    this.legalMoves = [];
 
                     madeMove = true;
                 }

@@ -143,29 +143,55 @@ export class Board extends Scene {
         this.game.infoPanel.update();
     }
 
-    getKingPos(color: number): Vector {
+    getKingPos(color: number): Vector | undefined {
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
-                let type = this.getPieceType(vec(x, y));
+                const type = this.getPieceType(vec(x, y));
 
                 if (type.charAt(0) == "k") {
-                    
+                    if (this.getPieceColor(vec(x, y)) == color) {
+                        return vec(x, y);
+                    }
                 }
             }
         }
     }
 
     kingInCheck(): number {
-        let allLegalMoves: Move[];
+        const allLegalMoves: Move[] = [];
+        const whiteKingPos = this.getKingPos(1);
+        const blackKingPos = this.getKingPos(2);
 
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
-                allLegalMoves = allLegalMoves.concat(Piece.getLegalMoves(this, vec(x, y)));
+                const legalMoves = Piece.getLegalMoves(this, vec(x, y));
+
+                if (legalMoves.length > 0) {
+                    allLegalMoves.push(...legalMoves);
+                }
             }
         }
 
-        allLegalMoves.forEach(move => {
-            if (move.end.equals())
-        });
+        for (const move of allLegalMoves) {
+            if (whiteKingPos != undefined) {
+                if (move.end.equals(whiteKingPos)) {
+                    // Make sure the other king isn't the one checking this king
+                    if (move.piece != "kb") {
+                        return 1;
+                    }
+                }
+            }
+
+            if (blackKingPos != undefined) {
+                if (move.end.equals(blackKingPos)) {
+                    // Make sure the other king isn't the one checking this king
+                    if (move.piece != "kw") {
+                        return 2;
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 }
