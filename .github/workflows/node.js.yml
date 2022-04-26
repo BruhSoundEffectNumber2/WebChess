@@ -20,11 +20,9 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: '16.x'
-
     # CI
     - run: npm ci
     - run: npm test
-
     # CD
     - run: npm run build:dev
     - run: |
