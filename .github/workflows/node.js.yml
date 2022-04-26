@@ -23,8 +23,8 @@ jobs:
 
     - name: CI
       run: |
-      npm ci
-      npm run test
+        npm ci
+        npm run test
 
     - name: CD
       run: |
