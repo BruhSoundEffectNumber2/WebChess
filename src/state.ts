@@ -28,7 +28,26 @@ export class State {
 
         this.turnCount++;
 
+        // TODO: draws
+
         this.check = this.board.kingInCheck();
+        if (this.check != 0) {
+            this.checkBehavior();
+        }
+    }
+
+    private checkBehavior(): void {
+        /**
+         * We have 3 ways to break a check.
+         * 1. The checking piece can be captured.
+         * 2. The king can move out of the way.
+         * 3. Another friendly piece can block the checking piece.
+         * If there are no ways to break the check, then it's a checkmate and the game is over.
+         */
+    }
+
+    private checkMate(): void {
+        // TODO: winning
     }
 
     // Singleton creation and getting
