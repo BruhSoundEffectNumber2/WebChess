@@ -25,9 +25,11 @@ jobs:
         npm ci
         npm run test
 
-    - name: CD
+    - name: Build
+      run: npm run build:prod
+      
+    - name: Deploy
       run: |
-        npm run build:dev
         git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
         npx gh-pages -d dist -u "github-actions-bot <support+actions@github.com>"
       env:
