@@ -1,10 +1,10 @@
 import { vec, Vector } from "excalibur";
+import { BoardState } from "../boardState";
 import { Move } from "../move";
-import { Board } from "../scenes/board";
 import { PieceRule } from "./pieceRule";
 
 export class RookRules implements PieceRule {
-    getLegalMoves(board: Board, pos: Vector): Move[] {
+    getLegalMoves(board: BoardState, pos: Vector): Move[] {
 
         // TODO: Castling
 

@@ -1,10 +1,10 @@
 import { vec, Vector } from "excalibur";
+import { BoardState } from "../boardState";
 import { Move } from "../move";
-import { Board } from "../scenes/board";
 import { PieceRule } from "./pieceRule";
 
 export class PawnRules implements PieceRule {
-    getLegalMoves(board: Board, pos: Vector): Move[] {
+    getLegalMoves(board: BoardState, pos: Vector): Move[] {
         // TODO: moving 2 spaces in first move/en passent
         
         /**
@@ -20,7 +20,6 @@ export class PawnRules implements PieceRule {
         
         // Temp variables for possible moves
         let optionColor;
-        let optionType;
         let optionPos;
 
         // Moving one up

@@ -1,7 +1,7 @@
 import { Vector } from "excalibur";
+import { BoardState } from "../boardState";
 import { Move } from "../move";
-import { Board } from "../scenes/board";
 
 export interface PieceRule {
-    getLegalMoves(board: Board, pos: Vector): Move[];
+    getLegalMoves(board: BoardState, pos: Vector): Move[];
 }
