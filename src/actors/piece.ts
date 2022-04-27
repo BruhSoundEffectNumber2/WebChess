@@ -1,4 +1,5 @@
 import { Actor, ImageSource, vec, Vector } from "excalibur";
+import { BoardState } from "../boardState";
 import { Move } from "../move";
 import { BishopRules } from "../pieceRules/bishopRules";
 import { KingRules } from "../pieceRules/kingRules";
@@ -74,7 +75,7 @@ export class Piece extends Actor {
     }
 
     // Gets the possible legal moves a piece can make
-    static getLegalMoves(board: Board, pos: Vector): Move[] {
+    static getLegalMoves(board: BoardState, pos: Vector): Move[] {
         const type = board.getPieceType(pos);        
 
         if (type == "") {

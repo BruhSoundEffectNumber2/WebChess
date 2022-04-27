@@ -1,10 +1,10 @@
 import { vec, Vector } from "excalibur";
+import { BoardState } from "../boardState";
 import { Move } from "../move";
-import { Board } from "../scenes/board";
 import { PieceRule } from "./pieceRule";
 
 export class KnightRules implements PieceRule {
-    getLegalMoves(board: Board, pos: Vector): Move[] {
+    getLegalMoves(board: BoardState, pos: Vector): Move[] {
         const moves: Move[] = [];
         const ourType = board.getPieceType(pos);
 
@@ -61,7 +61,7 @@ export class KnightRules implements PieceRule {
         return moves;
     }
 
-    isOptionValid(board: Board, ourPos: Vector, optionPos: Vector): boolean {
+    isOptionValid(board: BoardState, ourPos: Vector, optionPos: Vector): boolean {
         // Check that the option will be within the board
         if (optionPos.x < 0 || optionPos.x > 7 || optionPos.y < 0 || optionPos.y > 7) {
             return false;
