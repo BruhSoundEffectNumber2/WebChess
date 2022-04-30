@@ -8,7 +8,6 @@ import { PawnRules } from "../pieceRules/pawnRules";
 import { QueenRules } from "../pieceRules/queenRules";
 import { RookRules } from "../pieceRules/rookRules";
 import { Resources } from "../resources";
-import { Board } from "../scenes/board";
 
 export class Piece extends Actor {
     private type: string;

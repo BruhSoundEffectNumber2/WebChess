@@ -21,6 +21,14 @@ export class BoardState {
         ];
     }
 
+    copyStateFrom(state: BoardState) {
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                this.pieces[y][x] = state.pieces[y][x];
+            }
+        }
+    }
+
     getPieceType(pos: Vector): string {
         return this.pieces[pos.y][pos.x];
     }
@@ -38,21 +46,23 @@ export class BoardState {
         }
     }
 
-    movePiece(start: Vector, end: Vector): void {
+    movePiece(start: Vector, end: Vector, virtual = false): void {
         // Make sure a piece is there to be moved
         if (this.pieces[start.y][start.x] == "") {
             return;
         }
 
-        // TODO: Have logic for piece capturing
+        // TODO: Have more logic for piece capturing
         const pieceType = this.pieces[start.y][start.x];
         
         this.pieces[start.y][start.x] = "";
         this.pieces[end.y][end.x] = pieceType;
         
-        State.getState().board.resetPieceActors();
-        State.getState().turnMade();
-        State.getState().board.game.infoPanel.update();
+        if (!virtual) {
+            State.getState().board.resetPieceActors();
+            State.getState().turnMade();
+            State.getState().board.game.infoPanel.update();
+        }
     }
 
     getKingPos(color: number): Vector | undefined {

@@ -36,9 +36,11 @@ export class State {
 
         // TODO: draws
 
-        this.check = this.kingInCheck();
+        this.check = this.kingInCheck(this.boardState);
         if (this.check != 0) {
-            this.checkBehavior();
+            if (this.inCheckmate(this.boardState, this.check)) {
+                console.log(this.check + " in checkmate. Game over.");
+            }
         }
     }
 
@@ -52,18 +54,37 @@ export class State {
          */
     }
 
-    private checkMate(): void {
-        // TODO: winning
-    }
-
-    kingInCheck(): number {
-        const allLegalMoves: Move[] = [];
-        const whiteKingPos = this.boardState.getKingPos(1);
-        const blackKingPos = this.boardState.getKingPos(2);
+    inCheckmate(state: BoardState, ourColor: number): boolean {
+        // Look through all possible moves that we can make
+        const ourLegalMoves: Move[] = [];
 
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
-                const legalMoves = Piece.getLegalMoves(this.boardState, vec(x, y));
+                const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+                if (state.getPieceColor(vec(x, y)) == ourColor) {
+                    ourLegalMoves.push(...legalMoves);
+                }
+            }
+        }
+
+        // If there is no
+        for (const ourMove of ourLegalMoves) {
+            if (!this.kingInCheckWithMove(state, ourMove)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    kingInCheck(state: BoardState): number {
+        const allLegalMoves: Move[] = [];
+        const whiteKingPos = state.getKingPos(1);
+        const blackKingPos = state.getKingPos(2);
+
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                const legalMoves = Piece.getLegalMoves(state, vec(x, y));
 
                 if (legalMoves.length > 0) {
                     allLegalMoves.push(...legalMoves);
@@ -94,8 +115,15 @@ export class State {
         return 0;
     }
 
-    kingInCheckWithMove(possibleMove: Move): boolean {
-        return false;
+    kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean {
+        const newState = new BoardState();
+        newState.copyStateFrom(state);
+        newState.movePiece(possibleMove.start, possibleMove.end, true);
+
+        const kingCheckResult = this.kingInCheck(newState);
+        const ourColor = possibleMove.piece.charAt(1) == "w" ? 1 : 2;
+
+        return kingCheckResult == ourColor;
     }
 
     // Singleton creation and getting
