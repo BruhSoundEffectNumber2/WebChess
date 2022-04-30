@@ -22,7 +22,11 @@ export class BoardState {
     }
 
     copyStateFrom(state: BoardState) {
-        this.pieces = state.pieces;
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                this.pieces[y][x] = state.pieces[y][x];
+            }
+        }
     }
 
     getPieceType(pos: Vector): string {

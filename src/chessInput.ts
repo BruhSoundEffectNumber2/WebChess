@@ -31,10 +31,9 @@ export class ChessInput {
         if (this.activePiecePos != vec(-1, -1) && this.activePieceType && 
             State.getState().boardState.getPieceColor(eventPos) != 
                 State.getState().boardState.getPieceColor(this.activePiecePos)) {
-            const legalMoves: Move[] = this.legalMoves;
             let madeMove = false;
 
-            legalMoves.forEach(move => {
+            this.legalMoves.forEach(move => {
                 // We can't use a usual break here, so have a flag for when we have made our move
                 if (!madeMove && move.end.equals(eventPos)) {
                     State.getState().boardState.movePiece(this.activePiecePos, eventPos);
@@ -56,7 +55,19 @@ export class ChessInput {
 
                 this.activePieceType = pieceType;
                 this.activePiecePos = eventPos;
-                this.legalMoves = Piece.getLegalMoves(State.getState().boardState, this.activePiecePos);
+
+                // Check through all legal moves given by the piece so they don't result in a check
+                this.legalMoves = [];
+                const possibleMoves = Piece.getLegalMoves(State.getState().boardState, this.activePiecePos);
+
+                for (const move of possibleMoves) {
+                    if (!State.getState().kingInCheckWithMove(State.getState().boardState, move)) {
+                        this.legalMoves.push(move);
+                    }
+                }
+
+                console.log(State.getState().boardState);
+                
             }
         }
         
