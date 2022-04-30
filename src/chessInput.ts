@@ -65,9 +65,6 @@ export class ChessInput {
                         this.legalMoves.push(move);
                     }
                 }
-
-                console.log(State.getState().boardState);
-                
             }
         }
         

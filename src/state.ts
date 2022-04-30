@@ -38,7 +38,9 @@ export class State {
 
         this.check = this.kingInCheck(this.boardState);
         if (this.check != 0) {
-            this.checkBehavior();
+            if (this.inCheckmate(this.boardState, this.check)) {
+                console.log(this.check + " in checkmate. Game over.");
+            }
         }
     }
 
@@ -52,8 +54,27 @@ export class State {
          */
     }
 
-    private checkMate(): void {
-        // TODO: winning
+    inCheckmate(state: BoardState, ourColor: number): boolean {
+        // Look through all possible moves that we can make
+        const ourLegalMoves: Move[] = [];
+
+        for (let x = 0; x < 8; x++) {
+            for (let y = 0; y < 8; y++) {
+                const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+                if (state.getPieceColor(vec(x, y)) == ourColor) {
+                    ourLegalMoves.push(...legalMoves);
+                }
+            }
+        }
+
+        // If there is no
+        for (const ourMove of ourLegalMoves) {
+            if (!this.kingInCheckWithMove(state, ourMove)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     kingInCheck(state: BoardState): number {
