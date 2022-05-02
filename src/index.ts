@@ -1,9 +1,11 @@
-import { Engine, Loader } from "excalibur";
+import { Engine, Loader, vec } from "excalibur";
 import { InfoPanel } from "./actors/infoPanel";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
 import { State } from "./state";
+import { Button } from "./ui/button";
+
 export class Game extends Engine {
     public board: Board;
     public chessInput: ChessInput;
@@ -28,6 +30,8 @@ export class Game extends Engine {
         State.initState(this.board);
 
         this.infoPanel = new InfoPanel(this.board);
+
+        //game.add(new Button(vec(450, 300), vec(100, 30)));
 
         return super.start(loader);
     }

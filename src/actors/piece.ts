@@ -1,4 +1,4 @@
-import { Actor, ImageSource, vec, Vector } from "excalibur";
+import { Actor, ImageSource, Sprite, vec, Vector } from "excalibur";
 import { BoardState } from "../boardState";
 import { Move } from "../move";
 import { BishopRules } from "../pieceRules/bishopRules";
