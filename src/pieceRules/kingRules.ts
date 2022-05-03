@@ -1,7 +1,6 @@
 import { vec, Vector } from "excalibur";
 import { BoardState } from "../boardState";
 import { Move } from "../move";
-import { State } from "../state";
 import { PieceRule } from "./pieceRule";
 
 export class KingRules implements PieceRule {
