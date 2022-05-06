@@ -4,11 +4,13 @@ import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
 import { State } from "./state";
+import { Network } from "./network";
 
 export class Game extends Engine {
     public board: Board;
     public chessInput: ChessInput;
     public infoPanel: InfoPanel;
+    public network: Network;
 
     constructor() {
         super({ 
@@ -31,6 +33,8 @@ export class Game extends Engine {
         this.infoPanel = new InfoPanel(this.board);
 
         //game.add(new Button(vec(450, 300), vec(100, 30)));
+        this.network = new Network();
+        this.network.connect();
 
         return super.start(loader);
     }
