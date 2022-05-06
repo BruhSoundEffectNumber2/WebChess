@@ -1,10 +1,10 @@
-import { Engine, Loader, vec } from "excalibur";
+import { Engine, Loader } from "excalibur";
 import { InfoPanel } from "./actors/infoPanel";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
 import { State } from "./state";
-import { Button } from "./ui/button";
+import { io } from "socket.io-client";
 
 export class Game extends Engine {
     public board: Board;
@@ -46,3 +46,11 @@ game.start().then(() => {
 game.input.pointers.primary.on("up", function(event) {
     game.chessInput.onChessAction(event);
 });
+
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+    console.log("Connected: " + socket.id);
+});
+
+socket.emit("hello");
