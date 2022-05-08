@@ -1,39 +1,88 @@
+import { vec } from "excalibur";
 import { io, Socket } from "socket.io-client";
+import { Game } from ".";
 import { Move } from "./move";
+import { State } from "./state";
 
 export class Network {
+    private game: Game;
     private socket: Socket;
-    private connected = false;
+    private match: string;
+
+    constructor(game: Game) {
+        this.game = game;
+    }
 
     connect() {
-        this.socket = io("https://WebChessServer.damonlewis.repl.co");
+        let address = "";
+
+        switch (process.env.NODE_ENV) {
+            case "development":
+                address = "http://localhost:3000";
+                break;
+            case "production":
+                address = "https://WebChessServer.damonlewis.repl.co";
+                break;
+        }
+        
+        this.socket = io(address);
 
         this.socket.on("connect", () => {
             console.log("Connected to server.");
-            this.connected = true;
         });
 
         this.socket.on("disconnect", () => {
             console.log("Disconnected from server.");
-            this.connected = false;
         });
 
-        this.socket.on("move", (...args) => {
-            this.receiveMove(args[0]);
+        this.socket.on("matched", (match:string, ourPlayer: number) => {
+            this.matched(match, ourPlayer);
+        });
+
+        this.socket.on("move", (move) => {
+            /**
+             * The JSON process incorrectly converts property names between sending and receiving,
+             * so we need to create a new Move from the parsed JSON data.
+             */
+            const convertedMove = new Move(
+                move.piece, 
+                vec(move.start._x, move.start._y),
+                vec(move.end._x, move.end._y));
+
+            this.receiveMove(convertedMove);
         });
     }
 
     sendMove(move: Move) {
-        if (!this.connected) {
-            console.log("Trying to do move, but we are not connected.");
-            console.log(move);
-            return;
+        if (!this.socket.connected) {
+            console.warn("Trying to move when not connected.");
         }
 
-        this.socket.emit("move", move);
+        console.log("Sending move");
+        
+        this.socket.emit("move", this.match, move);
     }
 
-    receiveMove(move: Move) {
-        console.log(move);
+    private receiveMove(move: Move) {
+        console.log("Received move");
+
+        State.getState().boardState.movePiece(move.start, move.end, false, false);
+    }
+
+    startMatchmaking() {
+        if (!this.socket.connected) {
+            console.warn("Trying to match when not connected.");
+        }
+
+        console.log("Starting matchmaking");
+
+        this.socket.emit("match");
+    }
+
+    private matched(match: string, ourPlayer: number) {
+        console.log("Matched");
+
+        this.match = match;
+        this.game.startGame(ourPlayer);
     }
 }

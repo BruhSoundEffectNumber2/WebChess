@@ -10,8 +10,7 @@
     "dev": "webpack serve --config webpack.development.js",
     "start": "npm run dev",
     "build:dev": "webpack --config webpack.development.js",
-    "build:prod": "webpack --config webpack.production.js",
-    "deploy": "gh-pages -d dist"
+    "build:prod": "webpack --config webpack.production.js"
   },
   "author": "Excalibur.js Team",
   "license": "BSD-2-Clause",

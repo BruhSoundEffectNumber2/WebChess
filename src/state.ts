@@ -14,14 +14,17 @@ export class State {
     // Is any king in check (0: No, 1: White in check, 2: Black in check)
     public check = 0;
 
+    public ourPlayer: number;
+
     public board: Board;
     public boardState: BoardState;
 
-    constructor(board: Board) {
+    constructor(board: Board, ourPlayer: number) {
         this.playerTurn = 1;
         this.turnCount = 0;
         this.board = board;
         this.boardState = new BoardState();
+        this.ourPlayer = ourPlayer;
     }
 
     turnMade(): void {
@@ -42,6 +45,10 @@ export class State {
                 console.log(this.check + " in checkmate. Game over.");
             }
         }
+    }
+
+    turnMadeNetwork(moveMade: Move): void {
+        this.board.game.network.sendMove(moveMade);
     }
 
     private checkBehavior(): void {
@@ -118,7 +125,7 @@ export class State {
     kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean {
         const newState = new BoardState();
         newState.copyStateFrom(state);
-        newState.movePiece(possibleMove.start, possibleMove.end, true);
+        newState.movePiece(possibleMove.start, possibleMove.end, true, false);
 
         const kingCheckResult = this.kingInCheck(newState);
         const ourColor = possibleMove.piece.charAt(1) == "w" ? 1 : 2;
@@ -127,12 +134,12 @@ export class State {
     }
 
     // Singleton creation and getting
-    static initState(board: Board): void {
+    static initState(board: Board, ourPlayer: number): void {
         if (this.state) {
             throw new Error("Cannot create the state more than once.");
         }
 
-        this.state = new State(board);
+        this.state = new State(board, ourPlayer);
     }
 
     static getState(): State {

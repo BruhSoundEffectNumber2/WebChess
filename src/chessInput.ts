@@ -28,6 +28,11 @@ export class ChessInput {
             return;
         }
 
+        // We can only make a move if it's our turn to do it
+        if (State.getState().ourPlayer != State.getState().playerTurn) {
+            return;
+        }
+
         if (this.activePiecePos != vec(-1, -1) && this.activePieceType && 
             State.getState().boardState.getPieceColor(eventPos) != 
                 State.getState().boardState.getPieceColor(this.activePiecePos)) {
@@ -36,7 +41,7 @@ export class ChessInput {
             this.legalMoves.forEach(move => {
                 // We can't use a usual break here, so have a flag for when we have made our move
                 if (!madeMove && move.end.equals(eventPos)) {
-                    State.getState().boardState.movePiece(this.activePiecePos, eventPos);
+                    State.getState().boardState.movePiece(this.activePiecePos, eventPos, false, true);
             
                     this.activePiecePos = vec(-1, -1);
                     this.activePieceType = "";

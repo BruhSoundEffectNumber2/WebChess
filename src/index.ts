@@ -24,26 +24,31 @@ export class Game extends Engine {
         const loader = new Loader(Object.values(Resources));
         loader.suppressPlayButton = true;
 
+        //game.add(new Button(vec(450, 300), vec(100, 30)));
+        this.network = new Network(this);
+        this.network.connect();
+
+        return super.start(loader);
+    }
+
+    public startGame(ourPlayer: number) {
         this.board = new Board(this);
         this.chessInput = new ChessInput(this);
         
         game.add("board", this.board);
-        State.initState(this.board);
+        State.initState(this.board, ourPlayer);
 
         this.infoPanel = new InfoPanel(this.board);
 
-        //game.add(new Button(vec(450, 300), vec(100, 30)));
-        this.network = new Network();
-        this.network.connect();
-
-        return super.start(loader);
+        game.goToScene("board");
     }
 }
 
 const game = new Game();
 
 game.start().then(() => {
-    game.goToScene("board");
+    // Matchmaking
+    game.network.startMatchmaking();
 });
 
 game.input.pointers.primary.on("up", function(event) {
