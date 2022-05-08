@@ -1,4 +1,5 @@
 import { Vector, vec } from "excalibur";
+import { Move } from "./move";
 import { State } from "./state";
 
 export class BoardState {
@@ -46,7 +47,7 @@ export class BoardState {
         }
     }
 
-    movePiece(start: Vector, end: Vector, virtual = false): void {
+    movePiece(start: Vector, end: Vector, virtual = false, network = true): void {
         // Make sure a piece is there to be moved
         if (this.pieces[start.y][start.x] == "") {
             return;
@@ -62,6 +63,10 @@ export class BoardState {
             State.getState().board.resetPieceActors();
             State.getState().turnMade();
             State.getState().board.game.infoPanel.update();
+        }
+
+        if (network) {
+            State.getState().turnMadeNetwork(new Move(pieceType, start, end));
         }
     }
 
