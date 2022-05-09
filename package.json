@@ -1,8 +1,8 @@
 {
-  "name": "excalibur-webpack",
+  "name": "webchess",
   "version": "1.0.0",
   "private": true,
-  "description": "a webpack starter for excaliburjs projects",
+  "description": "A web-based chess game built using Excalibur and Typescript",
   "main": "index.js",
   "scripts": {
     "test": "npm run build:prod && ex-test -d ./dist -t ./test/test.js",
@@ -12,8 +12,7 @@
     "build:dev": "webpack --config webpack.development.js",
     "build:prod": "webpack --config webpack.production.js"
   },
-  "author": "Excalibur.js Team",
-  "license": "BSD-2-Clause",
+  "author": "Damon Lewis",
   "devDependencies": {
     "@excaliburjs/testing": "0.25.0",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
@@ -33,7 +32,6 @@
   },
   "dependencies": {
     "excalibur": "0.25.3",
-    "gh-pages": "^3.2.3",
     "socket.io-client": "^4.5.0"
   }
 }

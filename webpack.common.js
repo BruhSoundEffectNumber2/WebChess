@@ -1,15 +1,17 @@
+/* eslint-disable */
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
-const { webpack } = require("webpack");
 
 module.exports = {
-  entry: "./src/index.ts",
+  entry: {
+    index: "./src/index.ts",
+  },
   target: "web",
   output: {
-    filename: '[name].js',
-    sourceMapFilename: "[file].map",
-    path: path.resolve(__dirname, "dist"),
+    filename: '[name].[contenthash].js',
+    sourceMapFilename: "[file].[contenthash].map",
+    path: path.resolve(__dirname, "dist")
   },
   devtool: "source-map",
   module: {
@@ -43,6 +45,8 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       title: "Web Chess",
-    })
+      filename: "index.html",
+      template: "src/template.html",
+    }),
   ],
 };

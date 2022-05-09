@@ -14,18 +14,7 @@ export class Network {
     }
 
     connect() {
-        let address = "";
-
-        switch (process.env.NODE_ENV) {
-            case "development":
-                address = "http://localhost:3000";
-                break;
-            case "production":
-                address = "https://WebChessServer.damonlewis.repl.co";
-                break;
-        }
-        
-        this.socket = io(address);
+        this.socket = io(__ServerAddress__);
 
         this.socket.on("connect", () => {
             console.log("Connected to server.");
@@ -58,7 +47,7 @@ export class Network {
             console.warn("Trying to move when not connected.");
         }
 
-        console.log("Sending move");
+        console.log("Sending move" + move);
         
         this.socket.emit("move", this.match, move);
     }
