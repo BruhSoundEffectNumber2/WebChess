@@ -52,5 +52,7 @@ game.start().then(() => {
 });
 
 game.input.pointers.primary.on("up", function(event) {
-    game.chessInput.onChessAction(event);
+    if (game.chessInput) {
+        game.chessInput.onChessAction(event);
+    }
 });
