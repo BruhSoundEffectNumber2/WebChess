@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { test, expectLoaded, expectPage } = require("@excaliburjs/testing");
 
 test('Webpack template', async () => {

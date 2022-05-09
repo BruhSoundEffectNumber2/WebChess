@@ -1,3 +1,5 @@
+/* eslint-disable */
+const webpack = require("webpack");
 const { merge } = require("webpack-merge");
 const common = require("./webpack.common");
 
@@ -9,6 +11,11 @@ module.exports = merge(common, {
       directory: "./dist",
     },
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      __ServerAddress__: JSON.stringify("http://localhost:3000")
+    }),
+  ],
 });
 
 const productionConfig = merge([
