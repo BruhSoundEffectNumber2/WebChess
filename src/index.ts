@@ -1,11 +1,14 @@
-import { Engine, Loader } from "excalibur";
+// The stylesheet has to be imported into index so it can be found by Webpack
+import "./styles/main.scss";
+
+import { Engine, Loader, Input } from "excalibur";
 import { InfoPanel } from "./actors/infoPanel";
 import { ChessInput } from "./chessInput";
 import { Resources } from "./resources";
 import { Board } from "./scenes/board";
 import { State } from "./state";
 import { Network } from "./network";
-import "./styles/main.scss";
+import { MainMenu } from "./scenes/mainMenu";
 
 export class Game extends Engine {
     public board: Board;
@@ -16,7 +19,9 @@ export class Game extends Engine {
     constructor() {
         super({ 
             width: 900,
-            height: 600
+            height: 600,
+            canvasElementId: "game",
+            pointerScope: Input.PointerScope.Canvas,
         });
     }
 
@@ -27,7 +32,8 @@ export class Game extends Engine {
 
         //game.add(new Button(vec(450, 300), vec(100, 30)));
         this.network = new Network(this);
-        this.network.connect();
+
+        game.add("mainMenu", new MainMenu());
 
         return super.start(loader);
     }
@@ -48,8 +54,7 @@ export class Game extends Engine {
 const game = new Game();
 
 game.start().then(() => {
-    // Matchmaking
-    game.network.startMatchmaking();
+    game.goToScene("mainMenu");
 });
 
 game.input.pointers.primary.on("up", function(event) {
