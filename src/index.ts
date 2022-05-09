@@ -5,6 +5,7 @@ import { Resources } from "./resources";
 import { Board } from "./scenes/board";
 import { State } from "./state";
 import { Network } from "./network";
+import "./styles/main.scss";
 
 export class Game extends Engine {
     public board: Board;
