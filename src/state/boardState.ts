@@ -1,10 +1,10 @@
 import {Vector, vec} from 'excalibur';
 import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
-import {State} from './state';
 
 export class BoardState {
-  private pieces: Piece[][];
+  private pieces: Piece[][] | undefined[][];
+  // For the sake of space, we represent the initial conditions of the board as a string array
   private readonly startingStringPieces = [
     ['br', 'bp', '', '', '', '', 'wp', 'wr'],
     ['bn', 'bp', '', '', '', '', 'wp', 'wn'],
@@ -22,12 +22,14 @@ export class BoardState {
     } else {
       this.pieces = [];
 
+      // Loop through all 2d array of starting pieces as strings, then convert to objects
       for (let x = 0; x < 8; x++) {
         this.pieces[x] = [];
         for (let y = 0; y < 8; y++) {
-          // Typescript complains about a possible null object, so check with ?
-          const string = this.startingStringPieces[x]?.[y];
-          const pieceType = () => {
+          const string = this.startingStringPieces[x]![y];
+
+          // Lambda expressions to allow us to directly assign the result of a switch to a const
+          const pieceType = (() => {
             switch (string?.charAt(1)) {
               case 'r':
                 return PieceType.rook;
@@ -46,9 +48,9 @@ export class BoardState {
                   'Starting piece string contained an invalid type character',
                 );
             }
-          };
+          })();
 
-          const pieceSide = () => {
+          const pieceSide = (() => {
             switch (string?.charAt(0)) {
               case 'w':
                 return PieceSide.white;
@@ -59,70 +61,58 @@ export class BoardState {
                   'Starting piece string contained an invalid side character',
                 );
             }
-          };
+          })();
 
-          /**
-           * Non-null assertion weirdness to make typescript happy, even
-           * though we can know that we created the array.
-           */
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          this.pieces[x]![y] = new Piece(vec(x, y), pieceType(), pieceSide());
+          this.pieces[x]![y] = new Piece(vec(x, y), pieceType, pieceSide);
         }
       }
     }
   }
 
-  getPieceType(pos: Vector): string {
-    return this.pieces[pos.y][pos.x];
-  }
-
-  // Gets color of piece at pos. 0: empty, 1: white, 2: black
-  getPieceColor(pos: Vector): number {
-    const type = this.getPieceType(pos);
-
-    if (type == '') {
-      return 0;
-    } else if (type.charAt(1) == 'w') {
-      return 1;
-    } else {
-      return 2;
+  getPiece(pos: Vector): Piece | undefined {
+    if (pos.x < this.pieces.length || pos.x >= 0) {
+      if (pos.y < this.pieces[pos.x]!.length && pos.y >= 0) {
+        return this.pieces[pos.x]![pos.y];
+      }
     }
+
+    throw new Error('Trying to get piece type from outside the board.');
   }
 
-  movePiece(start: Vector, end: Vector, virtual = false, network = true): void {
+  movePiece(move: Move): void {
+    const piece = this.getPiece(move.start);
+
     // Make sure a piece is there to be moved
-    if (this.pieces[start.y][start.x] == '') {
+    if (piece == undefined) {
       return;
     }
 
-    // TODO: Have more logic for piece capturing
-    const pieceType = this.pieces[start.y][start.x];
+    this.pieces[move.start.x]![move.start.y] = undefined;
+    this.pieces[move.end.x]![move.end.y] = piece;
 
-    this.pieces[start.y][start.x] = '';
-    this.pieces[end.y][end.x] = pieceType;
-
+    /**
     if (!virtual) {
       State.getState().board.resetPieceActors();
       State.getState().turnMade();
       State.getState().board.game.infoPanel.update();
     }
-
-    if (network) {
-      State.getState().turnMadeNetwork(new Move(pieceType, start, end));
-    }
+    */
   }
 
-  getKingPos(color: number): Vector | undefined {
+  getKingPos(side: PieceSide): Vector | undefined {
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const type = this.getPieceType(vec(x, y));
+        const pos = vec(x, y);
+        const piece = this.getPiece(pos);
 
-        if (type.charAt(0) == 'k') {
-          if (this.getPieceColor(vec(x, y)) == color) {
-            return vec(x, y);
+        if (piece?.type == PieceType.king) {
+          if (piece?.side == side) {
+            return pos;
           }
         }
       }
     }
+
+    return undefined;
   }
 }

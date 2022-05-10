@@ -2,6 +2,7 @@ import {vec, Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
 import {BasePieceRules} from './basePieceRules';
+import { PieceSide } from '../helper/piece';
 
 export class BishopRules extends BasePieceRules {
   override getLegalMoves(board: BoardState, pos: Vector): Move[] {
@@ -13,10 +14,12 @@ export class BishopRules extends BasePieceRules {
     const moves: Move[] = [];
 
     const ourPiece = board.getPiece(pos);
-    const ourColor = board.getPieceSide(pos);
+
+    if (ourPiece == undefined) {
+      throw new Error('Trying to get the legal moves of an empty space.');
+    }
 
     // Temp variables for possible moves
-    let optionColor;
     let optionPos;
 
     // Moving up/right
@@ -29,10 +32,10 @@ export class BishopRules extends BasePieceRules {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
-
         if (this.isOptionValid(board, pos, optionPos)) {
           moves.push(new Move(ourPiece, pos, optionPos));
+
+          if (board.getPiece(optionPos))
         } else {
           break;
         }

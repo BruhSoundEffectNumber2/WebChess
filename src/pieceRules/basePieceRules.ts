@@ -6,9 +6,13 @@ export abstract class BasePieceRules {
   abstract getLegalMoves(board: BoardState, pos: Vector): Move[];
 
   /**
-   * Checks that we can move into a possible position.
+   * Returns whether a piece can move into a possible position.
    */
-  protected isOptionValid(board: BoardState, ourPos: Vector, optionPos: Vector): boolean {
+  protected isOptionValid(
+    board: BoardState,
+    ourPos: Vector,
+    optionPos: Vector,
+  ): boolean {
     // Check that the option will be within the board
     if (
       optionPos.x < 0 ||
@@ -19,9 +23,6 @@ export abstract class BasePieceRules {
       return false;
     }
 
-    const ourColor = board.getPieceColor(ourPos);
-    const optionColor = board.getPieceColor(optionPos);
-
-    return ourColor != optionColor;
+    return board.getPiece(ourPos)?.side != board.getPiece(optionPos)?.side;
   }
 }
