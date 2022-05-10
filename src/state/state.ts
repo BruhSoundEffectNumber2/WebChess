@@ -1,8 +1,8 @@
 import {vec} from 'excalibur';
-import {Piece} from './actors/piece';
+import {PieceActor} from '../actors/pieceActor';
 import {BoardState} from './boardState';
-import {Move} from './move';
-import {Board} from './scenes/board';
+import {Move} from '../helper/move';
+import {Board} from '../scenes/board';
 
 export class State {
   static state: State;
@@ -68,7 +68,7 @@ export class State {
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+        const legalMoves = PieceActor.getLegalMoves(state, vec(x, y));
         if (state.getPieceColor(vec(x, y)) == ourColor) {
           ourLegalMoves.push(...legalMoves);
         }
@@ -92,7 +92,7 @@ export class State {
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+        const legalMoves = PieceActor.getLegalMoves(state, vec(x, y));
 
         if (legalMoves.length > 0) {
           allLegalMoves.push(...legalMoves);

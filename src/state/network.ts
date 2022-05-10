@@ -1,7 +1,7 @@
 import {vec} from 'excalibur';
 import {io, Socket} from 'socket.io-client';
-import {Game} from '.';
-import {Move} from './move';
+import {Game} from '..';
+import {Move} from '../helper/move';
 import {State} from './state';
 
 export class Network {

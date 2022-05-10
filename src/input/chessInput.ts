@@ -1,9 +1,9 @@
 import {Input, vec, Vector} from 'excalibur';
-import {Game} from '.';
-import {Piece} from './actors/piece';
-import {Move} from './move';
-import {Board} from './scenes/board';
-import {State} from './state';
+import {Game} from '..';
+import {PieceActor} from '../actors/pieceActor';
+import {Move} from '../helper/move';
+import {Board} from '../scenes/board';
+import {State} from '../state/state';
 
 export class ChessInput {
   private activePieceType: string;
@@ -82,7 +82,7 @@ export class ChessInput {
          * they don't result in a check
          */
         this.legalMoves = [];
-        const possibleMoves = Piece.getLegalMoves(
+        const possibleMoves = PieceActor.getLegalMoves(
           State.getState().boardState,
           this.activePiecePos,
         );

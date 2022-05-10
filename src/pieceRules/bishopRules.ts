@@ -1,10 +1,10 @@
 import {vec, Vector} from 'excalibur';
-import {BoardState} from '../boardState';
-import {Move} from '../move';
-import {PieceRule} from './pieceRule';
+import {BoardState} from '../state/boardState';
+import {Move} from '../helper/move';
+import {BasePieceRules} from './basePieceRules';
 
-export class BishopRules implements PieceRule {
-  getLegalMoves(board: BoardState, pos: Vector): Move[] {
+export class BishopRules extends BasePieceRules {
+  override getLegalMoves(board: BoardState, pos: Vector): Move[] {
     /**
      * The bishop can move diagonally in any direction until it is
      * blocked by a friendly piece or it captures an enemy piece.
@@ -12,8 +12,8 @@ export class BishopRules implements PieceRule {
 
     const moves: Move[] = [];
 
-    const ourType = board.getPieceType(pos);
-    const ourColor = board.getPieceColor(pos);
+    const ourPiece = board.getPiece(pos);
+    const ourColor = board.getPieceSide(pos);
 
     // Temp variables for possible moves
     let optionColor;
@@ -31,13 +31,8 @@ export class BishopRules implements PieceRule {
 
         optionColor = board.getPieceColor(optionPos);
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
-            break;
-          }
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
         } else {
           break;
         }

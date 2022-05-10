@@ -3,11 +3,11 @@ import './styles/main.scss';
 
 import {Engine, Loader, Input} from 'excalibur';
 import {InfoPanel} from './actors/infoPanel';
-import {ChessInput} from './chessInput';
+import {ChessInput} from './input/chessInput';
 import {Resources} from './resources';
 import {Board} from './scenes/board';
-import {State} from './state';
-import {Network} from './network';
+import {State} from './state/state';
+import {Network} from './state/network';
 import {MainMenu} from './scenes/mainMenu';
 
 export class Game extends Engine {

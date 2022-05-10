@@ -1,13 +1,13 @@
 import {Actor, Color, Engine, Rectangle, Scene, vec, Vector} from 'excalibur';
 import {Game} from '..';
-import {MoveLocation} from '../actors/moveLocation';
-import {Piece} from '../actors/piece';
-import {Move} from '../move';
-import {State} from '../state';
+import {MoveLocationActor} from '../actors/moveLocationActor';
+import {PieceActor} from '../actors/pieceActor';
+import {Move} from '../helper/move';
+import {State} from '../state/state';
 
 export class Board extends Scene {
-  private pieceActors: Piece[];
-  private moveLocationActors: MoveLocation[];
+  private pieceActors: PieceActor[];
+  private moveLocationActors: MoveLocationActor[];
   public game: Game;
 
   constructor(game: Game) {
@@ -69,7 +69,7 @@ export class Board extends Scene {
           continue;
         }
 
-        const actor = new Piece(type, vec(x, y));
+        const actor = new PieceActor(type, vec(x, y));
         this.add(actor);
         this.pieceActors.push(actor);
       }
@@ -88,7 +88,7 @@ export class Board extends Scene {
     }
 
     moves.forEach((move) => {
-      const actor = new MoveLocation(move.end);
+      const actor = new MoveLocationActor(move.end);
       this.add(actor);
       this.moveLocationActors.push(actor);
     });

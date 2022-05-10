@@ -1,11 +1,12 @@
 import {Vector} from 'excalibur';
+import { Piece } from './piece';
 
 export class Move {
-  public piece: string;
+  public piece: Piece;
   public start: Vector;
   public end: Vector;
 
-  constructor(piece: string, start: Vector, end: Vector) {
+  constructor(piece: Piece, start: Vector, end: Vector) {
     this.piece = piece;
     this.start = start;
     this.end = end;

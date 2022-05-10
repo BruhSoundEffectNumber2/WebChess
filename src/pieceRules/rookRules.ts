@@ -1,6 +1,6 @@
 import {vec, Vector} from 'excalibur';
-import {BoardState} from '../boardState';
-import {Move} from '../move';
+import {BoardState} from '../state/boardState';
+import {Move} from '../helper/move';
 import {PieceRule} from './pieceRule';
 
 export class RookRules implements PieceRule {

@@ -1,6 +1,6 @@
-import {Actor, Color, Engine, Rectangle, vec, Vector} from 'excalibur';
+import {Actor, Color, Rectangle, vec, Vector} from 'excalibur';
 
-export class MoveLocation extends Actor {
+export class MoveLocationActor extends Actor {
   constructor(pos: Vector) {
     super({
       pos: vec(pos.x * 75, pos.y * 75),
@@ -8,7 +8,7 @@ export class MoveLocation extends Actor {
     });
   }
 
-  onInitialize(_engine: Engine): void {
+  override onInitialize(): void {
     const rectangle = new Rectangle({
       width: 75,
       height: 75,
