@@ -1,10 +1,11 @@
-import {Actor, ImageSource, vec, Vector} from 'excalibur';
+import {Actor, Sprite, vec, Vector} from 'excalibur';
+import {Piece, PieceSide, PieceType} from '../helper/piece';
 import {Resources} from '../resources';
 
 export class PieceActor extends Actor {
-  private type: string;
+  private _piece: Piece;
 
-  constructor(type: string, boardPos: Vector) {
+  constructor(piece: Piece, boardPos: Vector) {
     super({
       width: 45,
       height: 45,
@@ -12,53 +13,48 @@ export class PieceActor extends Actor {
       pos: vec(boardPos.x * 75 + 15, boardPos.y * 75 + 15),
     });
 
-    this.type = type;
+    this._piece = piece;
   }
 
   override onInitialize(): void {
-    this.graphics.use(this.getImage(this.type).toSprite());
+    this.graphics.use(this.getSprite());
   }
 
-  private getImage(type: string): ImageSource {
-    switch (type) {
-      case 'kw': {
-        return Resources.KW;
-      }
-      case 'kb': {
-        return Resources.KB;
-      }
-      case 'qw': {
-        return Resources.QW;
-      }
-      case 'qb': {
-        return Resources.QB;
-      }
-      case 'bw': {
-        return Resources.BW;
-      }
-      case 'bb': {
-        return Resources.BB;
-      }
-      case 'nw': {
-        return Resources.NW;
-      }
-      case 'nb': {
-        return Resources.NB;
-      }
-      case 'pw': {
-        return Resources.PW;
-      }
-      case 'pb': {
-        return Resources.PB;
-      }
-      case 'rw': {
-        return Resources.RW;
-      }
-      case 'rb': {
-        return Resources.RB;
-      }
+  private getSprite(): Sprite {
+    if (this._piece.side == PieceSide.white) {
+      return (() => {
+        switch (this._piece.type) {
+          case PieceType.king:
+            return Resources.KW;
+          case PieceType.queen:
+            return Resources.QW;
+          case PieceType.rook:
+            return Resources.RW;
+          case PieceType.bishop:
+            return Resources.BW;
+          case PieceType.knight:
+            return Resources.NW;
+          case PieceType.pawn:
+            return Resources.PW;
+        }
+      })().toSprite();
+    } else {
+      return (() => {
+        switch (this._piece.type) {
+          case PieceType.king:
+            return Resources.KB;
+          case PieceType.queen:
+            return Resources.QB;
+          case PieceType.rook:
+            return Resources.RB;
+          case PieceType.bishop:
+            return Resources.BB;
+          case PieceType.knight:
+            return Resources.NB;
+          case PieceType.pawn:
+            return Resources.PB;
+        }
+      })().toSprite();
     }
-
-    throw new Error('Could not find a resource for a piece of type: ' + type);
   }
 }

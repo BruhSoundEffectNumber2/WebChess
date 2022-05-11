@@ -43,7 +43,7 @@ export class Piece {
   }
 
   public get pos(): Vector {
-    return this.pos;
+    return this._pos;
   }
 
   public set pos(pos: Vector) {

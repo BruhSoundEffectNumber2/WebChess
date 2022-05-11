@@ -89,14 +89,6 @@ export class BoardState {
 
     this.pieces[move.start.x]![move.start.y] = undefined;
     this.pieces[move.end.x]![move.end.y] = piece;
-
-    /**
-    if (!virtual) {
-      State.getState().board.resetPieceActors();
-      State.getState().turnMade();
-      State.getState().board.game.infoPanel.update();
-    }
-    */
   }
 
   getKingPos(side: PieceSide): Vector {

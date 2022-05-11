@@ -2,6 +2,7 @@ import {vec} from 'excalibur';
 import {BoardState} from './boardState';
 import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
+import { Board } from '../scenes/board';
 
 export class State {
   private static _state: State | undefined = undefined;
@@ -33,6 +34,15 @@ export class State {
 
   get turnCount(): number {
     return this._turnCount;
+  }
+
+  get boardState(): BoardState {
+    return this._boardState;
+  }
+
+  pieceMoved(): void {
+    Board.get().resetPieceActors();
+    this.turnMade();
   }
 
   turnMade(): void {
