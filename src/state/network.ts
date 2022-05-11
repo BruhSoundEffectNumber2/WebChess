@@ -5,13 +5,10 @@ import {Move} from '../helper/move';
 import {State} from './state';
 
 export class Network {
-  private game: Game;
+  static _network: Network | undefined = undefined;
+
   private _socket!: Socket;
   private _match!: string;
-
-  constructor(game: Game) {
-    this.game = game;
-  }
 
   connect() {
     this._socket = io(__ServerAddress__);
@@ -74,6 +71,14 @@ export class Network {
     console.log('Matched');
 
     this._match = match;
-    this.game.startGame(ourPlayer);
+    Game.get().startGame(ourPlayer);
+  }
+
+  static get(): Network {
+    if (this._network == undefined) {
+      this._network = new Network();
+    }
+
+    return this._network;
   }
 }

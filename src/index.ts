@@ -8,8 +8,11 @@ import {Board} from './scenes/board';
 import {State} from './state/state';
 import {MainMenu} from './scenes/mainMenu';
 import {PieceSide} from './helper/piece';
+import {Network} from './state/network';
 
 export class Game extends Engine {
+  static _game: Game | undefined = undefined;
+
   constructor() {
     super({
       width: 900,
@@ -35,12 +38,22 @@ export class Game extends Engine {
 
     game.goToScene('board');
   }
+
+  static get(): Game {
+    if (this._game == undefined) {
+      this._game = new Game();
+    }
+
+    return this._game;
+  }
 }
 
-const game = new Game();
+const game = Game.get();
 
 game.start().then(() => {
   game.goToScene('mainMenu');
+  Network.get().connect();
+  Network.get().startMatchmaking();
 });
 
 game.input.pointers.primary.on('up', function (event) {

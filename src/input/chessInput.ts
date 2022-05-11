@@ -21,6 +21,9 @@ export class ChessInput {
       return;
     }
 
+    console.log(State.get().ourPlayer);
+    console.log(State.get().playerTurn);
+
     // We can only make a move if it's our turn to do it
     if (State.get().ourPlayer != State.get().playerTurn) {
       return;
