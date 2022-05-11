@@ -99,7 +99,7 @@ export class BoardState {
     */
   }
 
-  getKingPos(side: PieceSide): Vector | undefined {
+  getKingPos(side: PieceSide): Vector {
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
         const pos = vec(x, y);
@@ -113,6 +113,6 @@ export class BoardState {
       }
     }
 
-    return undefined;
+    throw new Error('Could not find a king on the board. One should be here.');
   }
 }

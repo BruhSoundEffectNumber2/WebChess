@@ -59,9 +59,7 @@ export class Piece {
     const piece = board.getPiece(pos);
 
     if (piece == undefined) {
-      throw new Error(
-        'Trying to get the legal moves of a piece that does not exist',
-      );
+      return [];
     }
 
     // Get the object that will give us the correct moves, then cast it to the parent
