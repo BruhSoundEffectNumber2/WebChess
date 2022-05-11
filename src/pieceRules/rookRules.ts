@@ -1,9 +1,9 @@
 import {vec, Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
-import {PieceRule} from './pieceRule';
+import {BasePieceRules} from './basePieceRules';
 
-export class RookRules implements PieceRule {
+export class RookRules extends BasePieceRules {
   getLegalMoves(board: BoardState, pos: Vector): Move[] {
     // TODO: Castling
 
@@ -13,11 +13,12 @@ export class RookRules implements PieceRule {
 
     const moves: Move[] = [];
 
-    const ourType = board.getPieceType(pos);
-    const ourColor = board.getPieceColor(pos);
+    const ourPiece = board.getPiece(pos);
+    if (ourPiece == undefined) {
+      throw new Error('Trying to get the legal moves of an empty space.');
+    }
 
     // Temp variables for possible moves
-    let optionColor;
     let optionPos;
 
     // Moving up
@@ -30,13 +31,10 @@ export class RookRules implements PieceRule {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {
@@ -55,13 +53,10 @@ export class RookRules implements PieceRule {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {
@@ -80,13 +75,10 @@ export class RookRules implements PieceRule {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {
@@ -105,13 +97,10 @@ export class RookRules implements PieceRule {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {

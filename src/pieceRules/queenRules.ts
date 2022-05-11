@@ -2,14 +2,13 @@ import {Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
 import {BishopRules} from './bishopRules';
-import {PieceRule} from './pieceRule';
+import {BasePieceRules} from './basePieceRules';
 import {RookRules} from './rookRules';
 
-export class QueenRules implements PieceRule {
+export class QueenRules extends BasePieceRules {
   getLegalMoves(board: BoardState, pos: Vector): Move[] {
     /**
-     * The queen combines the traits of the rook and bishop, and can
-     * move in every direction.
+     * The queen combines the traits of the rook and bishop.
      */
 
     const moves: Move[] = [];

@@ -1,6 +1,13 @@
-import { Vector } from 'excalibur';
+import {Vector} from 'excalibur';
+import {BasePieceRules} from '../pieceRules/basePieceRules';
+import {BishopRules} from '../pieceRules/bishopRules';
+import {KingRules} from '../pieceRules/kingRules';
+import {KnightRules} from '../pieceRules/knightRules';
+import {PawnRules} from '../pieceRules/pawnRules';
+import {QueenRules} from '../pieceRules/queenRules';
+import {RookRules} from '../pieceRules/rookRules';
 import {BoardState} from '../state/boardState';
-import { Move } from './move';
+import {Move} from './move';
 
 export enum PieceType {
   'king',
@@ -48,6 +55,33 @@ export class Piece {
   }
 
   static getLegalMoves(board: BoardState, pos: Vector): Move[] {
-    return [];
+    // Make sure the space has a piece on it
+    const piece = board.getPiece(pos);
+
+    if (piece == undefined) {
+      throw new Error(
+        'Trying to get the legal moves of a piece that does not exist',
+      );
+    }
+
+    // Get the object that will give us the correct moves, then cast it to the parent
+    const obj: BasePieceRules = (() => {
+      switch (piece._type) {
+        case PieceType.king:
+          return new KingRules();
+        case PieceType.queen:
+          return new QueenRules();
+        case PieceType.rook:
+          return new RookRules();
+        case PieceType.bishop:
+          return new BishopRules();
+        case PieceType.knight:
+          return new KnightRules();
+        case PieceType.pawn:
+          return new PawnRules();
+      }
+    })();
+
+    return obj.getLegalMoves(board, pos);
   }
 }

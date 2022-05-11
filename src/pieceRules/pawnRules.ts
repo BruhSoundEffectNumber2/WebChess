@@ -1,9 +1,10 @@
 import {vec, Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
-import {PieceRule} from './pieceRule';
+import {BasePieceRules} from './basePieceRules';
+import {PieceSide} from '../helper/piece';
 
-export class PawnRules implements PieceRule {
+export class PawnRules extends BasePieceRules {
   getLegalMoves(board: BoardState, pos: Vector): Move[] {
     // TODO: moving 2 spaces in first move/en passent
 
@@ -15,73 +16,86 @@ export class PawnRules implements PieceRule {
 
     const moves: Move[] = [];
 
-    const ourType = board.getPieceType(pos);
-    const ourColor = board.getPieceColor(pos);
+    const ourPiece = board.getPiece(pos);
+    if (ourPiece == undefined) {
+      throw new Error('Trying to get the legal moves of an empty space.');
+    }
 
     // Temp variables for possible moves
-    let optionColor;
     let optionPos;
 
     // Moving one up
-    if (pos.y != 0) {
-      optionPos = pos.add(vec(0, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 0 && ourColor == 1) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(0, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one up/left
-    if (pos.y != 0 && pos.x != 0) {
-      optionPos = pos.add(vec(-1, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 2 && ourColor == 1) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(-1, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one up/right
-    if (pos.y != 0 && pos.x != 7) {
-      optionPos = pos.add(vec(1, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 2 && ourColor == 1) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(1, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving down
-    if (pos.y != 7) {
-      optionPos = pos.add(vec(0, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 0 && ourColor == 2) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(0, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving down up/left
-    if (pos.y != 7 && pos.x != 0) {
-      optionPos = pos.add(vec(-1, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 1 && ourColor == 2) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(-1, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving down up/right
-    if (pos.y != 7 && pos.x != 7) {
-      optionPos = pos.add(vec(1, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor == 1 && ourColor == 2) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(1, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     return moves;
+  }
+
+  protected override isOptionValid(
+    board: BoardState,
+    ourPos: Vector,
+    optionPos: Vector,
+  ): boolean {
+    // Check that the option will be within the board
+    if (
+      optionPos.x < 0 ||
+      optionPos.x > 7 ||
+      optionPos.y < 0 ||
+      optionPos.y > 7
+    ) {
+      return false;
+    }
+
+    const ourPiece = board.getPiece(ourPos);
+    const optionPiece = board.getPiece(optionPos);
+    const posDif = optionPos.sub(ourPos);
+
+    // TODO: En passent, two spaces on first move
+
+    if (posDif.y == (ourPiece?.side == PieceSide.white ? -1 : 1)) {
+      if (posDif.x == 0) {
+        if (optionPiece == undefined) {
+          return true;
+        }
+      } else {
+        if (optionPiece != undefined && optionPiece.side != ourPiece?.side) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }
