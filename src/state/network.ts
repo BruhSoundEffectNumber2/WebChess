@@ -46,8 +46,6 @@ export class Network {
       console.warn('Trying to move when not connected.');
     }
 
-    console.log('Sending move' + move);
-
     this._socket.emit('move', this._match, move);
   }
 
@@ -55,6 +53,7 @@ export class Network {
     console.log('Received move');
 
     State.get().boardState.movePiece(move);
+    State.get().pieceMoved();
   }
 
   startMatchmaking() {

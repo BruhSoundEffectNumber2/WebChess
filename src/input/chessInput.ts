@@ -2,12 +2,13 @@ import {Input, vec} from 'excalibur';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
 import {Board} from '../scenes/board';
+import {Network} from '../state/network';
 import {State} from '../state/state';
 
 export class ChessInput {
   static _chessInput: ChessInput | undefined;
 
-  private _activePiece: Piece | undefined = undefined;
+  private _activePiece: Piece | null = null;
   private legalMoves: Move[] = [];
 
   onChessAction(event: Input.PointerEvent): void {
@@ -20,9 +21,6 @@ export class ChessInput {
     if (eventPos.x < 0 || eventPos.x > 7 || eventPos.y < 0 || eventPos.y > 7) {
       return;
     }
-
-    console.log(State.get().ourPlayer);
-    console.log(State.get().playerTurn);
 
     // We can only make a move if it's our turn to do it
     if (State.get().ourPlayer != State.get().playerTurn) {
@@ -43,11 +41,18 @@ export class ChessInput {
          * we have made our move. Have to double check that activePiece is not undefined.
          */
         if (!madeMove && move.end.equals(eventPos) && this._activePiece) {
-          State.get().boardState.movePiece(
-            new Move(this._activePiece, this._activePiece?.pos, eventPos),
+          const move = new Move(
+            this._activePiece,
+            this._activePiece?.pos,
+            eventPos,
           );
 
-          this._activePiece = undefined;
+          State.get().boardState.movePiece(move);
+
+          Network.get().sendMove(move);
+          State.get().pieceMoved();
+
+          this._activePiece = null;
           this.legalMoves = [];
 
           madeMove = true;
