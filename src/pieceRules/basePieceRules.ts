@@ -23,6 +23,12 @@ export abstract class BasePieceRules {
       return false;
     }
 
+    const optionPiece = board.getPiece(optionPos);
+    
+    if (optionPiece == undefined) {
+      return true;
+    }
+    
     return board.getPiece(ourPos)?.side != board.getPiece(optionPos)?.side;
   }
 }

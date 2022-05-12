@@ -1,7 +1,7 @@
 import {Scene} from 'excalibur';
 
 export class MainMenu extends Scene {
-  onActivate() {
+  override onActivate() {
     const startButton = document.createElement('button');
 
     startButton.className = 'button button-start';

@@ -5,30 +5,27 @@ import {Move} from '../helper/move';
 import {State} from './state';
 
 export class Network {
-  private game: Game;
-  private socket: Socket;
-  private match: string;
+  static _network: Network | undefined = undefined;
 
-  constructor(game: Game) {
-    this.game = game;
-  }
+  private _socket!: Socket;
+  private _match!: string;
 
   connect() {
-    this.socket = io(__ServerAddress__);
+    this._socket = io(__ServerAddress__);
 
-    this.socket.on('connect', () => {
+    this._socket.on('connect', () => {
       console.log('Connected to server.');
     });
 
-    this.socket.on('disconnect', () => {
+    this._socket.on('disconnect', () => {
       console.log('Disconnected from server.');
     });
 
-    this.socket.on('matched', (match: string, ourPlayer: number) => {
+    this._socket.on('matched', (match: string, ourPlayer: number) => {
       this.matched(match, ourPlayer);
     });
 
-    this.socket.on('move', (move) => {
+    this._socket.on('move', (move) => {
       /**
        * The JSON process incorrectly converts property names
        * between sending and receiving,
@@ -45,35 +42,42 @@ export class Network {
   }
 
   sendMove(move: Move) {
-    if (!this.socket.connected) {
+    if (!this._socket.connected) {
       console.warn('Trying to move when not connected.');
     }
 
-    console.log('Sending move' + move);
-
-    this.socket.emit('move', this.match, move);
+    this._socket.emit('move', this._match, move);
   }
 
   private receiveMove(move: Move) {
     console.log('Received move');
 
-    State.getState().boardState.movePiece(move.start, move.end, false, false);
+    State.get().boardState.movePiece(move);
+    State.get().pieceMoved();
   }
 
   startMatchmaking() {
-    if (!this.socket.connected) {
+    if (!this._socket.connected) {
       console.warn('Trying to match when not connected.');
     }
 
     console.log('Starting matchmaking');
 
-    this.socket.emit('match');
+    this._socket.emit('match');
   }
 
   private matched(match: string, ourPlayer: number) {
     console.log('Matched');
 
-    this.match = match;
-    this.game.startGame(ourPlayer);
+    this._match = match;
+    Game.get().startGame(ourPlayer);
+  }
+
+  static get(): Network {
+    if (this._network == undefined) {
+      this._network = new Network();
+    }
+
+    return this._network;
   }
 }

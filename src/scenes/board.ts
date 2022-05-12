@@ -1,21 +1,16 @@
-import {Actor, Color, Engine, Rectangle, Scene, vec, Vector} from 'excalibur';
-import {Game} from '..';
+import {Actor, Color, Rectangle, Scene, vec, Vector} from 'excalibur';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
 import {State} from '../state/state';
 
 export class Board extends Scene {
-  private pieceActors: PieceActor[];
-  private moveLocationActors: MoveLocationActor[];
-  public game: Game;
+  static _board: Board | undefined = undefined;
 
-  constructor(game: Game) {
-    super();
-    this.game = game;
-  }
+  private pieceActors!: PieceActor[];
+  private moveLocationActors!: MoveLocationActor[];
 
-  onInitialize(_engine: Engine): void {
+  override onInitialize(): void {
     // Rectangles for the board squares
     const lightSquare = new Rectangle({
       width: 75,
@@ -62,14 +57,14 @@ export class Board extends Scene {
 
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
-        const type = State.getState().boardState.getPieceType(vec(x, y));
+        const piece = State.get().boardState.getPiece(vec(x, y));
 
         // For when a space is not occupied by a piece
-        if (type == '') {
+        if (piece == undefined) {
           continue;
         }
 
-        const actor = new PieceActor(type, vec(x, y));
+        const actor = new PieceActor(piece, vec(x, y));
         this.add(actor);
         this.pieceActors.push(actor);
       }
@@ -92,5 +87,13 @@ export class Board extends Scene {
       this.add(actor);
       this.moveLocationActors.push(actor);
     });
+  }
+
+  static get(): Board {
+    if (this._board == undefined) {
+      this._board = new Board();
+    }
+
+    return this._board;
   }
 }

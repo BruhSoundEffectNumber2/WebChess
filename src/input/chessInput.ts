@@ -1,23 +1,15 @@
-import {Input, vec, Vector} from 'excalibur';
-import {Game} from '..';
-import {PieceActor} from '../actors/pieceActor';
+import {Input, vec} from 'excalibur';
 import {Move} from '../helper/move';
+import {Piece} from '../helper/piece';
 import {Board} from '../scenes/board';
+import {Network} from '../state/network';
 import {State} from '../state/state';
 
 export class ChessInput {
-  private activePieceType: string;
-  private activePiecePos: Vector;
+  static _chessInput: ChessInput | undefined;
 
-  private game: Game;
-  private board: Board;
-  private legalMoves: Move[];
-
-  constructor(game: Game) {
-    this.game = game;
-    this.board = game.board;
-    this.legalMoves = [];
-  }
+  private _activePiece: Piece | null = null;
+  private legalMoves: Move[] = [];
 
   onChessAction(event: Input.PointerEvent): void {
     const eventPos = vec(
@@ -31,75 +23,77 @@ export class ChessInput {
     }
 
     // We can only make a move if it's our turn to do it
-    if (State.getState().ourPlayer != State.getState().playerTurn) {
+    if (State.get().ourPlayer != State.get().playerTurn) {
       return;
     }
 
     if (
-      this.activePiecePos != vec(-1, -1) &&
-      this.activePieceType &&
-      State.getState().boardState.getPieceColor(eventPos) !=
-        State.getState().boardState.getPieceColor(this.activePiecePos)
+      this._activePiece &&
+      (State.get().boardState.getPiece(eventPos) == undefined ||
+        State.get().boardState.getPiece(eventPos)?.side !=
+          this._activePiece.side)
     ) {
       let madeMove = false;
 
       this.legalMoves.forEach((move) => {
         /**
          * We can't use a usual break here, so have a flag for when
-         * we have made our move
+         * we have made our move. Have to double check that activePiece is not undefined.
          */
-        if (!madeMove && move.end.equals(eventPos)) {
-          State.getState().boardState.movePiece(
-            this.activePiecePos,
+        if (!madeMove && move.end.equals(eventPos) && this._activePiece) {
+          const move = new Move(
+            this._activePiece,
+            this._activePiece?.pos,
             eventPos,
-            false,
-            true,
           );
 
-          this.activePiecePos = vec(-1, -1);
-          this.activePieceType = '';
+          State.get().boardState.movePiece(move);
+
+          Network.get().sendMove(move);
+          State.get().pieceMoved();
+
+          this._activePiece = null;
           this.legalMoves = [];
 
           madeMove = true;
         }
       });
     } else {
-      const pieceType = State.getState().boardState.getPieceType(eventPos);
+      const piece = State.get().boardState.getPiece(eventPos);
 
-      if (pieceType != '') {
-        if (
-          State.getState().boardState.getPieceColor(eventPos) !=
-          State.getState().playerTurn
-        ) {
+      if (piece != undefined) {
+        if (piece.side != State.get().playerTurn) {
           return;
         }
 
-        this.activePieceType = pieceType;
-        this.activePiecePos = eventPos;
+        this._activePiece = State.get().boardState.getPiece(eventPos);
 
         /**
          * Check through all legal moves given by the piece so
          * they don't result in a check
          */
         this.legalMoves = [];
-        const possibleMoves = PieceActor.getLegalMoves(
-          State.getState().boardState,
-          this.activePiecePos,
+        const possibleMoves = Piece.getLegalMoves(
+          State.get().boardState,
+          this._activePiece!.pos,
         );
 
         for (const move of possibleMoves) {
-          if (
-            !State.getState().kingInCheckWithMove(
-              State.getState().boardState,
-              move,
-            )
-          ) {
+          if (!State.get().kingInCheckWithMove(State.get().boardState, move)) {
             this.legalMoves.push(move);
           }
         }
       }
     }
 
-    this.board.resetMoveLocationActors(this.legalMoves);
+    Board.get().resetMoveLocationActors(this.legalMoves);
+  }
+
+  static get(): ChessInput {
+    if (this._chessInput == undefined) {
+      this._chessInput = new ChessInput();
+    }
+
+    return this._chessInput;
   }
 }

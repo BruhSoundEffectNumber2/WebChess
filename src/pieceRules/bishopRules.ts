@@ -2,7 +2,6 @@ import {vec, Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
 import {BasePieceRules} from './basePieceRules';
-import { PieceSide } from '../helper/piece';
 
 export class BishopRules extends BasePieceRules {
   override getLegalMoves(board: BoardState, pos: Vector): Move[] {
@@ -14,7 +13,6 @@ export class BishopRules extends BasePieceRules {
     const moves: Move[] = [];
 
     const ourPiece = board.getPiece(pos);
-
     if (ourPiece == undefined) {
       throw new Error('Trying to get the legal moves of an empty space.');
     }
@@ -35,7 +33,9 @@ export class BishopRules extends BasePieceRules {
         if (this.isOptionValid(board, pos, optionPos)) {
           moves.push(new Move(ourPiece, pos, optionPos));
 
-          if (board.getPiece(optionPos))
+          if (board.getPiece(optionPos) != undefined) {
+            break;
+          }
         } else {
           break;
         }
@@ -52,13 +52,10 @@ export class BishopRules extends BasePieceRules {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {
@@ -77,13 +74,10 @@ export class BishopRules extends BasePieceRules {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {
@@ -102,13 +96,10 @@ export class BishopRules extends BasePieceRules {
           break;
         }
 
-        optionColor = board.getPieceColor(optionPos);
+        if (this.isOptionValid(board, pos, optionPos)) {
+          moves.push(new Move(ourPiece, pos, optionPos));
 
-        if (optionColor != ourColor) {
-          moves.push(new Move(ourType, pos, optionPos));
-
-          // Once we hit an enemy piece, we can't go any further
-          if (optionColor != 0) {
+          if (board.getPiece(optionPos) != undefined) {
             break;
           }
         } else {

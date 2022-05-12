@@ -1,81 +1,92 @@
 import {vec} from 'excalibur';
-import {PieceActor} from '../actors/pieceActor';
 import {BoardState} from './boardState';
 import {Move} from '../helper/move';
-import {Board} from '../scenes/board';
+import {Piece, PieceSide, PieceType} from '../helper/piece';
+import { Board } from '../scenes/board';
 
 export class State {
-  static state: State;
+  private static _state: State | undefined = undefined;
 
   // Which player is making their turn
-  public playerTurn: number;
+  private _playerTurn: PieceSide;
   // How many turns have been made
-  public turnCount: number;
-  // Is any king in check (0: No, 1: White in check, 2: Black in check)
-  public check = 0;
+  private _turnCount: number;
+  // Is any king in check (King in check, no check, cross check respectively)
+  private _check: PieceSide | undefined | boolean = undefined;
 
-  public ourPlayer: number;
+  private _ourPlayer: PieceSide;
+  private _boardState: BoardState;
 
-  public board: Board;
-  public boardState: BoardState;
+  constructor(ourPlayer: PieceSide) {
+    this._playerTurn = PieceSide.white;
+    this._turnCount = 0;
+    this._boardState = new BoardState();
+    this._ourPlayer = ourPlayer;
+  }
 
-  constructor(board: Board, ourPlayer: number) {
-    this.playerTurn = 1;
-    this.turnCount = 0;
-    this.board = board;
-    this.boardState = new BoardState();
-    this.ourPlayer = ourPlayer;
+  get playerTurn(): PieceSide {
+    return this._playerTurn;
+  }
+
+  get ourPlayer(): PieceSide {
+    return this._ourPlayer;
+  }
+
+  get turnCount(): number {
+    return this._turnCount;
+  }
+
+  get boardState(): BoardState {
+    return this._boardState;
+  }
+
+  pieceMoved(): void {
+    Board.get().resetPieceActors();
+    this.turnMade();
   }
 
   turnMade(): void {
-    // Update the player whose turn it is
-    if (this.playerTurn == 1) {
-      this.playerTurn = 2;
-    } else {
-      this.playerTurn = 1;
-    }
+    this._playerTurn =
+      this._playerTurn == PieceSide.white ? PieceSide.black : PieceSide.white;
 
-    this.turnCount++;
+    this._turnCount++;
 
     // TODO: draws
 
-    this.check = this.kingInCheck(this.boardState);
-    if (this.check != 0) {
-      if (this.inCheckmate(this.boardState, this.check)) {
-        console.log(this.check + ' in checkmate. Game over.');
+    this._check = this.kingInCheck(this._boardState);
+    if (this._check != undefined) {
+      if (this._check == true) {
+        if (this.inCheckmate(this._boardState, PieceSide.white)) {
+          console.log(this._check + ' in checkmate. Game over.');
+        }
+
+        if (this.inCheckmate(this._boardState, PieceSide.black)) {
+          console.log(this._check + ' in checkmate. Game over.');
+        }
+      } else {
+        if (this.inCheckmate(this._boardState, this._check as PieceSide)) {
+          console.log(this._check + ' in checkmate. Game over.');
+        }
       }
     }
   }
 
-  turnMadeNetwork(moveMade: Move): void {
-    this.board.game.network.sendMove(moveMade);
-  }
-
-  private checkBehavior(): void {
-    /**
-     * We have 3 ways to break a check.
-     * 1. The checking piece can be captured.
-     * 2. The king can move out of the way.
-     * 3. Another friendly piece can block the checking piece.
-     * If there are no ways to break the check, then it's a
-     * checkmate and the game is over.
-     */
-  }
-
-  inCheckmate(state: BoardState, ourColor: number): boolean {
+  inCheckmate(state: BoardState, ourColor: PieceSide): boolean {
     // Look through all possible moves that we can make
     const ourLegalMoves: Move[] = [];
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = PieceActor.getLegalMoves(state, vec(x, y));
-        if (state.getPieceColor(vec(x, y)) == ourColor) {
+        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+        const piece = state.getPiece(vec(x, y));
+
+        if (piece && piece.side == ourColor) {
           ourLegalMoves.push(...legalMoves);
         }
       }
     }
 
-    // If there is no
+    // If there is even one possible move to get us out of check, we are not in checkmate
     for (const ourMove of ourLegalMoves) {
       if (!this.kingInCheckWithMove(state, ourMove)) {
         return false;
@@ -85,69 +96,89 @@ export class State {
     return true;
   }
 
-  kingInCheck(state: BoardState): number {
+  kingInCheck(state: BoardState): undefined | PieceSide | boolean {
     const allLegalMoves: Move[] = [];
-    const whiteKingPos = state.getKingPos(1);
-    const blackKingPos = state.getKingPos(2);
+    const whiteKingPos = state.getKingPos(PieceSide.white);
+    const blackKingPos = state.getKingPos(PieceSide.black);
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = PieceActor.getLegalMoves(state, vec(x, y));
+        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
 
-        if (legalMoves.length > 0) {
-          allLegalMoves.push(...legalMoves);
-        }
+        allLegalMoves.push(...legalMoves);
       }
     }
+
+    let whiteCheck;
+    let blackCheck;
 
     for (const move of allLegalMoves) {
-      if (whiteKingPos != undefined) {
-        if (move.end.equals(whiteKingPos)) {
-          // Make sure the other king isn't the one checking this king
-          if (move.piece != 'kb') {
-            return 1;
-          }
+      whiteCheck = false;
+      blackCheck = false;
+
+      if (move.end.equals(whiteKingPos)) {
+        // Make sure the black king isn't the one checking the white king
+        if (
+          move.piece.side != PieceSide.black &&
+          move.piece.type != PieceType.king
+        ) {
+          whiteCheck = true;
         }
       }
 
-      if (blackKingPos != undefined) {
-        if (move.end.equals(blackKingPos)) {
-          // Make sure the other king isn't the one checking this king
-          if (move.piece != 'kw') {
-            return 2;
-          }
+      if (move.end.equals(blackKingPos)) {
+        // Make sure the white king isn't the one checking the black king
+        if (
+          move.piece.side != PieceSide.white &&
+          move.piece.type != PieceType.king
+        ) {
+          blackCheck = true;
         }
       }
     }
 
-    return 0;
+    if (!whiteCheck && !blackCheck) {
+      return undefined;
+    } else if (whiteCheck != blackCheck) {
+      return whiteCheck ? PieceSide.white : PieceSide.black;
+    } else {
+      return true;
+    }
   }
 
   kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean {
-    const newState = new BoardState();
-    newState.copyStateFrom(state);
-    newState.movePiece(possibleMove.start, possibleMove.end, true, false);
+    const newState = new BoardState(state);
+    newState.movePiece(possibleMove);
 
     const kingCheckResult = this.kingInCheck(newState);
-    const ourColor = possibleMove.piece.charAt(1) == 'w' ? 1 : 2;
+    const ourColor = possibleMove.piece.side;
 
-    return kingCheckResult == ourColor;
+    if (kingCheckResult == true) {
+      return true;
+    } else if (
+      kingCheckResult == PieceSide.black ||
+      kingCheckResult == PieceSide.white
+    ) {
+      return kingCheckResult == ourColor;
+    } else {
+      return false;
+    }
   }
 
   // Singleton creation and getting
-  static initState(board: Board, ourPlayer: number): void {
-    if (this.state) {
+  static init(ourPlayer: PieceSide): void {
+    if (this._state) {
       throw new Error('Cannot create the state more than once.');
     }
 
-    this.state = new State(board, ourPlayer);
+    this._state = new State(ourPlayer);
   }
 
-  static getState(): State {
-    if (!this.state) {
-      throw new Error('State has not been created.');
+  static get(): State {
+    if (!this._state) {
+      throw new Error('Trying to get State when it has not been created.');
     }
 
-    return this.state;
+    return this._state;
   }
 }

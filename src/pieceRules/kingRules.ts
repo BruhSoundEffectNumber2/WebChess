@@ -1,9 +1,9 @@
 import {vec, Vector} from 'excalibur';
 import {BoardState} from '../state/boardState';
 import {Move} from '../helper/move';
-import {PieceRule} from './pieceRule';
+import {BasePieceRules} from './basePieceRules';
 
-export class KingRules implements PieceRule {
+export class KingRules extends BasePieceRules {
   getLegalMoves(board: BoardState, pos: Vector): Move[] {
     /**
      * The King can move one space in every direction.
@@ -11,91 +11,60 @@ export class KingRules implements PieceRule {
 
     const moves: Move[] = [];
 
-    const ourType = board.getPieceType(pos);
-    const ourColor = board.getPieceColor(pos);
+    const ourPiece = board.getPiece(pos);
+    if (ourPiece == undefined) {
+      throw new Error('Trying to get the legal moves of an empty space.');
+    }
 
     // Temp variables for possible moves
-    let optionColor;
     let optionPos;
 
     // Moving one up
-    if (pos.y != 0) {
-      optionPos = pos.add(vec(0, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(0, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one down
-    if (pos.y != 7) {
-      optionPos = pos.add(vec(0, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(0, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one left
-    if (pos.x != 0) {
-      optionPos = pos.add(vec(-1, 0));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(-1, 0));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one right
-    if (pos.x != 7) {
-      optionPos = pos.add(vec(1, 0));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(1, 0));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one up/left
-    if (pos.x != 0 && pos.y != 0) {
-      optionPos = pos.add(vec(-1, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(-1, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one up/right
-    if (pos.x != 7 && pos.y != 0) {
-      optionPos = pos.add(vec(1, -1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(1, -1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one down/left
-    if (pos.x != 0 && pos.y != 7) {
-      optionPos = pos.add(vec(-1, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(-1, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     // Moving one down/right
-    if (pos.x != 7 && pos.y != 7) {
-      optionPos = pos.add(vec(1, 1));
-      optionColor = board.getPieceColor(optionPos);
-
-      if (optionColor != ourColor) {
-        moves.push(new Move(ourType, pos, optionPos));
-      }
+    optionPos = pos.add(vec(1, 1));
+    if (this.isOptionValid(board, pos, optionPos)) {
+      moves.push(new Move(ourPiece, pos, optionPos));
     }
 
     return moves;
