@@ -1,7 +1,7 @@
 // The stylesheet has to be imported into index so it can be found by Webpack
 import './styles/main.scss';
 
-import {Engine, Loader, Input} from 'excalibur';
+import {Engine, Loader} from 'excalibur';
 import {ChessInput} from './input/chessInput';
 import {Resources} from './resources';
 import {Board} from './scenes/board';
@@ -18,7 +18,7 @@ export class Game extends Engine {
       width: 900,
       height: 600,
       canvasElementId: 'game',
-      pointerScope: Input.PointerScope.Canvas,
+
     });
   }
 
@@ -53,10 +53,11 @@ const game = Game.get();
 game.start().then(() => {
   game.goToScene('mainMenu');
   Network.get().connect();
-  Network.get().startMatchmaking();
 });
 
 game.input.pointers.primary.on('up', function (event) {
+  console.log('in');
+  
   if (game.currentScene == Board.get()) {
     ChessInput.get().onChessAction(event);
   }
