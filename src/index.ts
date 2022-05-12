@@ -1,7 +1,7 @@
 // The stylesheet has to be imported into index so it can be found by Webpack
 import './styles/main.scss';
 
-import {Engine, Loader} from 'excalibur';
+import {Engine, Input, Loader} from 'excalibur';
 import {ChessInput} from './input/chessInput';
 import {Resources} from './resources';
 import {Board} from './scenes/board';
@@ -18,7 +18,7 @@ export class Game extends Engine {
       width: 900,
       height: 600,
       canvasElementId: 'game',
-
+      pointerScope: Input.PointerScope.Document,
     });
   }
 
@@ -56,8 +56,12 @@ game.start().then(() => {
 });
 
 game.input.pointers.primary.on('up', function (event) {
-  console.log('in');
-  
+  // We should stop the input from proceeding if we are over a child of the ui
+  const elementsOver = document.elementsFromPoint(
+    event.coordinates.pagePos.x,
+    event.coordinates.pagePos.y,
+  );
+
   if (game.currentScene == Board.get()) {
     ChessInput.get().onChessAction(event);
   }
