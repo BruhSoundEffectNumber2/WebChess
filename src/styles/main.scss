@@ -1,12 +1,15 @@
 $font-stack: Helvetica, sans-serif;
 $background1: rgb(45, 45, 45);
 $background2: rgb(30, 30, 30);
+$errorColor: rgb(255, 50, 0);
+$baseColor: aliceblue;
 $game-width: 900px;
 $game-height: 600px;
 
+/* Root and UI elements */
 body {
   font: 100% $font-stack;
-  color: aliceblue;
+  color: $baseColor;
   background-color: $background1;
   padding: 0;
 }
@@ -30,13 +33,14 @@ body {
   height: $game-height;
 }
 
+/* Main Menu */
 div#ui.mainMenu button.button--start {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: $background1;
-  color: aliceblue;
+  color: $baseColor;
   border-width: 1px;
   width: 140px;
   height: 40px;
@@ -45,4 +49,21 @@ div#ui.mainMenu button.button--start {
 
 div#ui.mainMenu button.button--start:hover {
   background: $background2;
+}
+
+/* Connection Error */
+div#ui div.error--popuo {
+
+}
+
+div#ui div.error--popup p.header {
+  
+}
+
+div#ui div.error--popup p.body {
+  
+}
+
+div#ui div.error--popup button.acknowledge {
+  
 }
