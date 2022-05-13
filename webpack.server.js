@@ -36,6 +36,10 @@ module.exports = {
       },
     ]
   },
+  externals: {
+    bufferutil: "bufferutil",
+    "utf-8-validate": "utf-8-validate",
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
@@ -47,7 +51,5 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new CompressionWebpackPlugin(),
-    new webpack.IgnorePlugin({resourceRegExp: /utf-8-validate/}),
-    new webpack.IgnorePlugin({resourceRegExp: /bufferutil/}),
   ]
 }

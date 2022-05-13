@@ -66,7 +66,6 @@ game.input.pointers.primary.on('up', function (event) {
   if (elementsOver[0]?.id != 'ui') {
     return;
   }
-  
 
   if (game.currentScene == Board.get()) {
     ChessInput.get().onChessAction(event);

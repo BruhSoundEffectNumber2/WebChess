@@ -10,12 +10,28 @@ export class Network {
 
   private _socket!: Socket;
   private _match!: string;
+  private _connectionAttempts = 0;
+  // How many times will the socket try to connect before giving up
+  private readonly maxConnectionAttempts = 3;
 
   connect() {
     this._socket = io(__ServerAddress__);
 
     this._socket.on('connect', () => {
       console.log('Connected to server.');
+    });
+
+    this._socket.on('connect_error', (err) => {
+      this._connectionAttempts++;
+      console.log('Could not connect due to %s', err.message);
+
+      if (this._connectionAttempts >= this.maxConnectionAttempts) {
+        console.log(
+          'We have been unable to connect to the server, disconnecting socket...',
+        );
+
+        this._socket.disconnect();
+      }
     });
 
     this._socket.on('disconnect', () => {
