@@ -11,8 +11,8 @@ module.exports = {
   },
   target: 'node',
   output: {
-    filename: '[name].[contenthash].js',
-    sourceMapFilename: '[file].[contenthash].map',
+    filename: '[name].js',
+    sourceMapFilename: '[file].map',
     path: path.resolve(__dirname, 'dist'),
   },
   mode: "production",
