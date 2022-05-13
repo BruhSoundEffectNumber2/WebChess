@@ -10,18 +10,25 @@
     "dev": "webpack serve --config webpack.development.js",
     "start": "npm run dev",
     "build:dev": "webpack --config webpack.development.js",
-    "build:prod": "webpack --config webpack.production.js"
+    "build:prod": "webpack --config webpack.production.js",
+    "build:server": "webpack --config webpack.server.js"
   },
   "author": "Damon Lewis",
   "devDependencies": {
     "@excaliburjs/testing": "0.25.0",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "@typescript-eslint/parser": "^5.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
     "clean-webpack-plugin": "3.0.0",
     "compression-webpack-plugin": "7.1.2",
-    "eslint": "^8.13.0",
+    "css-loader": "^6.7.1",
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
     "html-webpack-plugin": "5.5.0",
+    "mini-css-extract-plugin": "^2.6.0",
+    "sass": "^1.51.0",
+    "sass-loader": "^12.6.0",
     "source-map-loader": "2.0.2",
+    "style-loader": "^3.3.1",
     "terser-webpack-plugin": "5.3.1",
     "ts-loader": "9.2.8",
     "typescript": "4.6.3",
@@ -32,6 +39,7 @@
   },
   "dependencies": {
     "excalibur": "0.25.3",
+    "socket.io": "^4.5.0",
     "socket.io-client": "^4.5.0"
   }
 }

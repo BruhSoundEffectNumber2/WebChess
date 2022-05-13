@@ -1,0 +1,48 @@
+$font-stack: Helvetica, sans-serif;
+$background1: rgb(45, 45, 45);
+$background2: rgb(30, 30, 30);
+$game-width: 900px;
+$game-height: 600px;
+
+body {
+  font: 100% $font-stack;
+  color: aliceblue;
+  background-color: $background1;
+  padding: 0;
+}
+
+.game-name {
+  padding: 0;
+  font-size: 24pt;
+}
+
+#root {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#root #ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $game-width;
+  height: $game-height;
+}
+
+div#ui.mainMenu button.button--start {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: $background1;
+  color: aliceblue;
+  border-width: 1px;
+  width: 140px;
+  height: 40px;
+  transition-duration: 100ms;
+}
+
+div#ui.mainMenu button.button--start:hover {
+  background: $background2;
+}
