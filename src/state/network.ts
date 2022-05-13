@@ -2,6 +2,7 @@ import {vec} from 'excalibur';
 import {io, Socket} from 'socket.io-client';
 import {Game} from '..';
 import {Move} from '../helper/move';
+import {Piece} from '../helper/piece';
 import {State} from './state';
 
 export class Network {
@@ -26,18 +27,18 @@ export class Network {
     });
 
     this._socket.on('move', (move) => {
-      /**
-       * The JSON process incorrectly converts property names
-       * between sending and receiving,
-       * so we need to create a new Move from the parsed JSON data.
-       */
-      const convertedMove = new Move(
-        move.piece,
-        vec(move.start._x, move.start._y),
-        vec(move.end._x, move.end._y),
+      // Convert from object literal to class instance
+      this.receiveMove(
+        new Move(
+          new Piece(
+            vec(move._piece._x, move._piece._y),
+            move._piece._type,
+            move._piece._side,
+          ),
+          vec(move._start._x, move._start._y),
+          vec(move._end._x, move._end._y),
+        ),
       );
-
-      this.receiveMove(convertedMove);
     });
   }
 

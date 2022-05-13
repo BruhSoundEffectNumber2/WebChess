@@ -62,6 +62,12 @@ game.input.pointers.primary.on('up', function (event) {
     event.coordinates.pagePos.y,
   );
 
+  // Look through the list of elements, if the UI is first, allow the input to continue
+  if (elementsOver[0]?.id != 'ui') {
+    return;
+  }
+  
+
   if (game.currentScene == Board.get()) {
     ChessInput.get().onChessAction(event);
   }
