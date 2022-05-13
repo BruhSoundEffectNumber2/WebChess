@@ -1,26 +1,28 @@
 /* eslint-disable */
-const path = require('path');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CompressionWebpackPlugin = require("compression-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
   entry: {
-    index: './src/index.ts',
+    index: './src/server/chessServer.ts',
   },
-  target: 'web',
+  target: 'node',
   output: {
     filename: '[name].[contenthash].js',
     sourceMapFilename: '[file].[contenthash].map',
     path: path.resolve(__dirname, 'dist'),
   },
+  mode: "production",
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
   devtool: 'source-map',
   module: {
     rules: [
-      {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-      },
       {
         test: /\.js$/,
         use: ['source-map-loader'],
@@ -32,11 +34,7 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      {
-        test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
-      },
-    ],
+    ]
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
@@ -48,11 +46,8 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin(),
-    new HtmlWebPackPlugin({
-      title: 'Web Chess',
-      filename: 'index.html',
-      template: 'src/template.html',
-    }),
-  ],
-};
+    new CompressionWebpackPlugin(),
+    new webpack.IgnorePlugin({resourceRegExp: /utf-8-validate/}),
+    new webpack.IgnorePlugin({resourceRegExp: /bufferutil/}),
+  ]
+}
