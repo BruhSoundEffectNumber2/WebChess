@@ -3,6 +3,7 @@ import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
 import {State} from '../state/state';
+import { UIManager } from '../ui/uiManager';
 
 export class Board extends Scene {
   static _board: Board | undefined = undefined;
@@ -10,7 +11,9 @@ export class Board extends Scene {
   private pieceActors!: PieceActor[];
   private moveLocationActors!: MoveLocationActor[];
 
-  override onInitialize(): void {
+  override onActivate(): void {
+    UIManager.get().sceneActivated('board');
+
     // Rectangles for the board squares
     const lightSquare = new Rectangle({
       width: 75,
@@ -41,10 +44,24 @@ export class Board extends Scene {
       }
     }
 
+    // Create UI elements
+    const bg = document.createElement('div');
+    bg.className = 'bg';
+    const info = document.createElement('p');
+    info.className = 'info';
+    info.textContent = 'White to move';
+
+    UIManager.get().ui.appendChild(bg);
+    bg.appendChild(info);
+
     this.pieceActors = [];
     this.moveLocationActors = [];
 
     this.resetPieceActors();
+  }
+
+  override onDeactivate(): void {
+    UIManager.get().sceneDeactivated('board');
   }
 
   resetPieceActors(): void {

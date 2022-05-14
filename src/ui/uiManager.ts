@@ -1,9 +1,15 @@
+export interface DecisionCallback<T1, T2 = void> {
+  (param1: T1): T2;
+}
+
 export class UIManager {
   static manager: UIManager | undefined = undefined;
   private _ui: HTMLElement;
-  private _currentClass: string | null = null;
+  private _currentClasses: string[];
 
   private constructor() {
+    this._currentClasses = [];
+
     // Store the element for later to avoid calls to the DOM
     const ui = document.getElementById('ui');
 
@@ -15,25 +21,112 @@ export class UIManager {
   }
 
   sceneActivated(name: string): void {
-    if (this._currentClass != null) {
-      throw new Error(
-        'A scene has been activated when the old scene is still up.',
-      );
+    if (this._currentClasses[this._currentClasses.indexOf(name)] != null) {
+      throw new Error('Trying to create a duplicate class on UI element.');
     }
 
-    this._currentClass = name;
-    this.ui.classList.add(this._currentClass);
+    this._currentClasses.push(name);
+    this.ui.classList.add(name);
   }
 
-  sceneDeactivated(): void {
-    if (this._currentClass == null) {
+  sceneDeactivated(name: string): void {
+    if (this._currentClasses[this._currentClasses.indexOf(name)] == null) {
       throw new Error(
-        'Trying to deactivate a scene UI when one has not been created yet.',
+        'Trying to remove a class that does not exist from UI element.',
       );
     }
 
-    this.ui.classList.remove(this._currentClass);
+    this.ui.classList.remove(name);
     this.ui.innerHTML = '';
+  }
+
+  showErrorPopup(headerText: string, bodyText: string) {
+    const base = document.createElement('div');
+    base.classList.add('popup');
+
+    const header = document.createElement('p');
+    header.classList.add('error--header');
+
+    const body = document.createElement('p');
+    body.classList.add('body');
+
+    const acknowledgement = document.createElement('button');
+    acknowledgement.classList.add('error--option');
+
+    this._ui.appendChild(base);
+    base.appendChild(header);
+    base.appendChild(body);
+    base.appendChild(acknowledgement);
+
+    header.textContent = headerText;
+    body.textContent = bodyText;
+    acknowledgement.textContent = 'Ok';
+
+    acknowledgement.onclick = (e) => {
+      e.preventDefault();
+
+      base.remove();
+      header.remove();
+      body.remove();
+      acknowledgement.remove();
+    };
+  }
+
+  decisionPopup(
+    headerText: string,
+    bodyText: string,
+    option1Text: string,
+    option1CB: DecisionCallback<MouseEvent>,
+    option2Text: string,
+    option2CB: DecisionCallback<MouseEvent>,
+  ) {
+    const base = document.createElement('div');
+    base.classList.add('popup');
+
+    const header = document.createElement('p');
+    header.classList.add('header');
+
+    const body = document.createElement('p');
+    body.classList.add('body');
+
+    const option1 = document.createElement('button');
+    option1.classList.add('option');
+
+    const option2 = document.createElement('button');
+    option2.classList.add('option');
+
+    this._ui.appendChild(base);
+    base.appendChild(header);
+    base.appendChild(body);
+    base.appendChild(option1);
+    base.appendChild(option2);
+
+    header.textContent = headerText;
+    body.textContent = bodyText;
+    option1.textContent = option1Text;
+    option2.textContent = option2Text;
+
+    option1.onclick = (e) => {
+      e.preventDefault();
+
+      option1CB(e);
+      base.remove();
+      header.remove();
+      body.remove();
+      option1.remove();
+      option2.remove();
+    };
+
+    option2.onclick = (e) => {
+      e.preventDefault();
+
+      option2CB(e);
+      base.remove();
+      header.remove();
+      body.remove();
+      option1.remove();
+      option2.remove();
+    };
   }
 
   static get(): UIManager {

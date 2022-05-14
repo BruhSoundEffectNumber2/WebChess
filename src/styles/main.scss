@@ -2,15 +2,29 @@ $font-stack: Helvetica, sans-serif;
 $background1: rgb(45, 45, 45);
 $background2: rgb(30, 30, 30);
 $errorColor: rgb(255, 50, 0);
+$buttonHoverColor: rgb(255, 150, 0);
 $baseColor: aliceblue;
 $game-width: 900px;
 $game-height: 600px;
+$default-transition-duration: 100ms;
+
+/* Global mixins */
+@mixin anchorCenter {
+  transform: translate(-50%, -50%);
+}
+
+@mixin center {
+  @include anchorCenter();
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
 
 /* Root and UI elements */
 body {
   font: 100% $font-stack;
   color: $baseColor;
-  background-color: $background1;
+  background-color: $background2;
   padding: 0;
 }
 
@@ -21,8 +35,6 @@ body {
 
 #root {
   position: relative;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 #root #ui {
@@ -35,35 +47,83 @@ body {
 
 /* Main Menu */
 div#ui.mainMenu button.button--start {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: $background1;
+  @include center();
+
+  background-color: $background1;
+  border: 0;
   color: $baseColor;
-  border-width: 1px;
   width: 140px;
   height: 40px;
-  transition-duration: 100ms;
+  transition-duration: $default-transition-duration;
 }
 
 div#ui.mainMenu button.button--start:hover {
+  background: $buttonHoverColor;
+  color: black;
+}
+
+/* Popups */
+@mixin popup-header {
+  font: 125% $font-stack;
+  margin: 0;
+  color: $baseColor;
+  border-bottom: 1px solid white;
+  height: 25px;
+}
+
+@mixin popup-button {
+  margin: 2px 5% 2px 5%;
+  height: 26px;
+  background-color: $background1;
+  border: 0;
+  color: $baseColor;
+  transition-duration: $default-transition-duration;
+}
+
+@mixin popup-button-hover {
+  background-color: $buttonHoverColor;
+  color: black;
+}
+
+div#ui div.popup {
+  @include center();
+
+  border: 2px solid $background1;
   background: $background2;
+  width: 200px;
+  height: 150px;
 }
 
-/* Connection Error */
-div#ui div.error--popuo {
-
+div#ui div.popup p.header {
+  @include popup-header();
 }
 
-div#ui div.error--popup p.header {
-  
+div#ui div.popup p.body {
+  font: 90% $font-stack;
+  margin: 5px 2px 5px 2px;
+  height: 84px;
 }
 
-div#ui div.error--popup p.body {
-  
+div#ui div.popup button.option {
+  @include popup-button();
+  width: 40%;
 }
 
-div#ui div.error--popup button.acknowledge {
-  
+div#ui div.popup button.option:hover {
+  @include popup-button-hover();
+}
+
+/* Error */
+div#ui div.popup p.error--header {
+  @include popup-header();
+  color: $errorColor;
+}
+
+div#ui div.popup button.error--option {
+  @include popup-button();
+  width: 90%;
+}
+
+div#ui div.popup button.error--option:hover {
+  @include popup-button-hover();
 }

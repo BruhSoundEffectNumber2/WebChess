@@ -1,5 +1,6 @@
 // The stylesheet has to be imported into index so it can be found by Webpack
 import './styles/main.scss';
+import './styles/board.scss';
 
 import {Engine, Input, Loader} from 'excalibur';
 import {ChessInput} from './input/chessInput';
@@ -8,7 +9,6 @@ import {Board} from './scenes/board';
 import {State} from './state/state';
 import {MainMenu} from './scenes/mainMenu';
 import {PieceSide} from './helper/piece';
-import {Network} from './state/network';
 
 export class Game extends Engine {
   static _game: Game | undefined = undefined;
@@ -52,7 +52,6 @@ const game = Game.get();
 
 game.start().then(() => {
   game.goToScene('mainMenu');
-  Network.get().connect();
 });
 
 game.input.pointers.primary.on('up', function (event) {

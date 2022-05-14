@@ -3,6 +3,8 @@ import {io, Socket} from 'socket.io-client';
 import {Game} from '..';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
+import { MainMenu } from '../scenes/mainMenu';
+import {UIManager} from '../ui/uiManager';
 import {State} from './state';
 
 export class Network {
@@ -30,7 +32,15 @@ export class Network {
           'We have been unable to connect to the server, disconnecting socket...',
         );
 
+        UIManager.get().showErrorPopup(
+          'Connection Error',
+          'There was an error when connecting to the server, and all retry attempts failed.',
+        );
         this._socket.disconnect();
+        if (Game.get().scenes['mainMenu'] == Game.get().currentScene) {
+          (Game.get().currentScene as MainMenu).reset();
+        }
+        this._connectionAttempts = 0;
       }
     });
 
