@@ -6,11 +6,39 @@ div#ui.board div.bg {
   height: 600px;
   top: 0px;
   left: 600px;
-  background-color: main.$background1;
-  border: 0;
+  background-color: main.$background2;
+  border: 1px solid white;
+  border-left: 0;
 }
 
 div#ui.board div.bg p.info {
-  margin: 0;
+  margin: 5px;
   font: 125% main.$font-stack;
+  text-align: center;
+}
+
+div#ui.board div.bg button.surrender {
+  @include main.button();
+
+  position: absolute;
+  top: 85%;
+  width: 90%;
+  height: 34px;
+}
+
+div#ui.board div.bg button.surrender:hover {
+  @include main.button-hover();
+}
+
+div#ui.board div.bg button.offerDraw {
+  @include main.button();
+
+  position: absolute;
+  top: 92.5%;
+  width: 90%;
+  height: 34px;
+}
+
+div#ui.board div.bg button.offerDraw:hover {
+  @include main.button-hover();
 }

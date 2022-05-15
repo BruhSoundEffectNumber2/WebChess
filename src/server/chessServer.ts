@@ -20,10 +20,6 @@ io.on('connection', (socket) => {
     matchingPlayers.splice(matchingPlayers.indexOf(socket.id), 1);
   });
 
-  socket.on('move', (match, move) => {
-    socket.to(match).emit('move', move);
-  });
-
   socket.on('match', () => {
     matchingPlayers.push(socket.id);
 
@@ -32,6 +28,26 @@ io.on('connection', (socket) => {
 
   socket.on('matchEnd', () => {
     // End of match behavior, scoring, ranking, etc
+  });
+
+  socket.on('move', (match, move) => {
+    socket.to(match).emit('move', move);
+  });
+
+  socket.on('surrender', (match) => {
+    socket.to(match).emit('surrender');
+  });
+
+  socket.on('offerDraw', (match) => {
+    socket.to(match).emit('offerDraw');
+  });
+
+  socket.on('drawAccepted', (match) => {
+    socket.to(match).emit('drawAccepted');
+  });
+
+  socket.on('drawRejected', (match) => {
+    socket.to(match).emit('drawRejected');
   });
 });
 

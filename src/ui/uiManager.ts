@@ -42,7 +42,11 @@ export class UIManager {
     this.ui.innerHTML = '';
   }
 
-  showErrorPopup(headerText: string, bodyText: string) {
+  playButtonClickAudio(): void {
+    Resources.buttonPress.play(0.1);
+  }
+
+  errorPopup(headerText: string, bodyText: string) {
     const base = document.createElement('div');
     base.classList.add('popup');
 
@@ -67,7 +71,40 @@ export class UIManager {
     acknowledgement.onclick = (e) => {
       e.preventDefault();
 
-      Resources.buttonPress.play(0.1);
+      this.playButtonClickAudio();
+      base.remove();
+      header.remove();
+      body.remove();
+      acknowledgement.remove();
+    };
+  }
+
+  alertPopup(headerText: string, bodyText: string) {
+    const base = document.createElement('div');
+    base.classList.add('popup');
+
+    const header = document.createElement('p');
+    header.classList.add('header');
+
+    const body = document.createElement('p');
+    body.classList.add('body');
+
+    const acknowledgement = document.createElement('button');
+    acknowledgement.classList.add('error--option');
+
+    this._ui.appendChild(base);
+    base.appendChild(header);
+    base.appendChild(body);
+    base.appendChild(acknowledgement);
+
+    header.textContent = headerText;
+    body.textContent = bodyText;
+    acknowledgement.textContent = 'Ok';
+
+    acknowledgement.onclick = (e) => {
+      e.preventDefault();
+
+      this.playButtonClickAudio();
       base.remove();
       header.remove();
       body.remove();
@@ -112,7 +149,7 @@ export class UIManager {
     option1.onclick = (e) => {
       e.preventDefault();
 
-      Resources.buttonPress.play(0.1);
+      this.playButtonClickAudio();
       option1CB(e);
       base.remove();
       header.remove();

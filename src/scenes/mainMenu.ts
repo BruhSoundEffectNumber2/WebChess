@@ -1,5 +1,4 @@
 import {Scene} from 'excalibur';
-import {Resources} from '../resources';
 import {Network} from '../state/network';
 import {UIManager} from '../ui/uiManager';
 
@@ -16,8 +15,8 @@ export class MainMenu extends Scene {
 
     this._startButton.onclick = (e) => {
       e.preventDefault();
-      
-      Resources.buttonPress.play(0.1);
+
+      UIManager.get().playButtonClickAudio();
       Network.get().connect();
       Network.get().startMatchmaking();
       this._startButton!.textContent = 'Finding Match';

@@ -3,7 +3,7 @@ import {io, Socket} from 'socket.io-client';
 import {Game} from '..';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
-import { MainMenu } from '../scenes/mainMenu';
+import {MainMenu} from '../scenes/mainMenu';
 import {UIManager} from '../ui/uiManager';
 import {State} from './state';
 
@@ -32,7 +32,7 @@ export class Network {
           'We have been unable to connect to the server, disconnecting socket...',
         );
 
-        UIManager.get().showErrorPopup(
+        UIManager.get().errorPopup(
           'Connection Error',
           'There was an error when connecting to the server, and all retry attempts failed.',
         );
@@ -66,14 +66,54 @@ export class Network {
         ),
       );
     });
+
+    this._socket.on('surrender', () => {
+      UIManager.get().alertPopup(
+        'Surrender',
+        'Your opponent has decided to surrender. The match will now end.',
+      );
+    });
+
+    this._socket.on('offerDraw', () => {
+      UIManager.get().decisionPopup(
+        'Draw Offered',
+        'Your opponent has offered a draw. You can choose to accept or reject it.',
+        'Accept',
+        () => {
+          this._socket.emit('drawAccepted', this._match);
+        },
+        'Reject',
+        () => {
+          this._socket.emit('drawRejected', this._match);
+        },
+      );
+    });
+
+    this._socket.on('drawAccepted', () => {
+      UIManager.get().alertPopup(
+        'Draw Accepted',
+        'Your opponent has agreed to draw. The match will now end.',
+      );
+    });
+
+    this._socket.on('drawRejected', () => {
+      UIManager.get().alertPopup(
+        'Draw Rejected',
+        'Your opponent has not agreed to draw. The match will continue.',
+      );
+    });
   }
 
   sendMove(move: Move) {
-    if (!this._socket.connected) {
-      console.warn('Trying to move when not connected.');
-    }
-
     this._socket.emit('move', this._match, move);
+  }
+
+  offerDraw(): void {
+    this._socket.emit('offerDraw', this._match);
+  }
+
+  surrender(): void {
+    this._socket.emit('surrender', this._match);
   }
 
   private receiveMove(move: Move) {
@@ -82,10 +122,6 @@ export class Network {
   }
 
   startMatchmaking() {
-    if (!this._socket.connected) {
-      console.warn('Trying to match when not connected.');
-    }
-
     console.log('Starting matchmaking');
 
     this._socket.emit('match');

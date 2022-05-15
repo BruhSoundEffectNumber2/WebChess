@@ -71,7 +71,7 @@ div#ui.mainMenu button.button--start:hover {
   height: 25px;
 }
 
-@mixin popup-button {
+@mixin button {
   margin: 2px 5% 2px 5%;
   height: 26px;
   background-color: $background1;
@@ -80,7 +80,7 @@ div#ui.mainMenu button.button--start:hover {
   transition-duration: $default-transition-duration;
 }
 
-@mixin popup-button-hover {
+@mixin button-hover {
   background-color: $buttonHoverColor;
   color: black;
 }
@@ -105,12 +105,12 @@ div#ui div.popup p.body {
 }
 
 div#ui div.popup button.option {
-  @include popup-button();
+  @include button();
   width: 40%;
 }
 
 div#ui div.popup button.option:hover {
-  @include popup-button-hover();
+  @include button-hover();
 }
 
 /* Error */
@@ -120,10 +120,10 @@ div#ui div.popup p.error--header {
 }
 
 div#ui div.popup button.error--option {
-  @include popup-button();
+  @include button();
   width: 90%;
 }
 
 div#ui div.popup button.error--option:hover {
-  @include popup-button-hover();
+  @include button-hover();
 }

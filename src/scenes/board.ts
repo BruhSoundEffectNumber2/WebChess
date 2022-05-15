@@ -2,8 +2,9 @@ import {Actor, Color, Rectangle, Scene, vec, Vector} from 'excalibur';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
+import {Network} from '../state/network';
 import {State} from '../state/state';
-import { UIManager } from '../ui/uiManager';
+import {UIManager} from '../ui/uiManager';
 
 export class Board extends Scene {
   static _board: Board | undefined = undefined;
@@ -47,12 +48,39 @@ export class Board extends Scene {
     // Create UI elements
     const bg = document.createElement('div');
     bg.className = 'bg';
+
     const info = document.createElement('p');
     info.className = 'info';
-    info.textContent = 'White to move';
+    info.textContent = 'Default Text Content';
+
+    const surrender = document.createElement('button');
+    surrender.className = 'surrender';
+    surrender.textContent = 'Surrender';
+    surrender.onclick = () => {
+      UIManager.get().decisionPopup(
+        'Are You Sure?',
+        'Are you sure you want to surrender? The match will count as a loss.',
+        'Go Back',
+        () => {/* Don't surrender */},
+        'Surrender',
+        () => {
+          Network.get().surrender();
+        }
+      );
+    };
+
+    const offerDraw = document.createElement('button');
+    offerDraw.className = 'offerDraw';
+    offerDraw.textContent = 'Offer Draw';
+    offerDraw.onclick = () => {
+      UIManager.get().playButtonClickAudio();
+      Network.get().offerDraw();
+    };
 
     UIManager.get().ui.appendChild(bg);
     bg.appendChild(info);
+    bg.appendChild(surrender);
+    bg.appendChild(offerDraw);
 
     this.pieceActors = [];
     this.moveLocationActors = [];
