@@ -1,4 +1,4 @@
-import {ImageSource} from 'excalibur';
+import {ImageSource, Sound} from 'excalibur';
 
 // Chess Pieces
 import kw from './resources/images/pieces/KW.png';
@@ -13,6 +13,9 @@ import pw from './resources/images/pieces/PW.png';
 import pb from './resources/images/pieces/PB.png';
 import rw from './resources/images/pieces/RW.png';
 import rb from './resources/images/pieces/RB.png';
+
+// Audio
+import buttonPress from './resources/audio/ui/buttonPress.ogg';
 
 /**
  * Default global resource dictionary. This gets loaded immediately
@@ -32,6 +35,8 @@ const Resources = {
   PB: new ImageSource(pb),
   RW: new ImageSource(rw),
   RB: new ImageSource(rb),
+  // Audio
+  buttonPress: new Sound(buttonPress),
 };
 
 export {Resources};

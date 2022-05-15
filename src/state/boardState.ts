@@ -98,15 +98,12 @@ export class BoardState {
   }
 
   movePiece(move: Move): void {
-    const piece = this.getPiece(move.start);
-
-    // Make sure a piece is there to be moved
-    if (piece == undefined) {
-      return;
-    }
+    const piece = this.pieces[move.start.x]![move.start.y]!;
 
     this.pieces[move.start.x]![move.start.y] = null;
     this.pieces[move.end.x]![move.end.y] = piece;
+    
+    piece.pos = vec(move.end.x, move.end.y);
   }
 
   getKingPos(side: PieceSide): Vector {

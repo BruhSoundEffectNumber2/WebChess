@@ -22,6 +22,10 @@ module.exports = {
         type: 'asset/resource',
       },
       {
+        test: /\.(ogg|mp3|wav?g)$/i,
+        use: 'file-loader',
+      },
+      {
         test: /\.js$/,
         use: ['source-map-loader'],
         exclude: [path.resolve(__dirname, 'node_modules/excalibur')],

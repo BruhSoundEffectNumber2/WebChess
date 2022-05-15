@@ -1,3 +1,5 @@
+import {Resources} from '../resources';
+
 export interface DecisionCallback<T1, T2 = void> {
   (param1: T1): T2;
 }
@@ -65,6 +67,7 @@ export class UIManager {
     acknowledgement.onclick = (e) => {
       e.preventDefault();
 
+      Resources.buttonPress.play(0.1);
       base.remove();
       header.remove();
       body.remove();
@@ -109,6 +112,7 @@ export class UIManager {
     option1.onclick = (e) => {
       e.preventDefault();
 
+      Resources.buttonPress.play(0.1);
       option1CB(e);
       base.remove();
       header.remove();
@@ -120,6 +124,7 @@ export class UIManager {
     option2.onclick = (e) => {
       e.preventDefault();
 
+      Resources.buttonPress.play(0.1);
       option2CB(e);
       base.remove();
       header.remove();

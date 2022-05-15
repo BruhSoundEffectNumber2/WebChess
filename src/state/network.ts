@@ -37,7 +37,7 @@ export class Network {
           'There was an error when connecting to the server, and all retry attempts failed.',
         );
         this._socket.disconnect();
-        if (Game.get().scenes['mainMenu'] == Game.get().currentScene) {
+        if (Game.get().scenes['mainMenu']?.isCurrentScene) {
           (Game.get().currentScene as MainMenu).reset();
         }
         this._connectionAttempts = 0;
@@ -77,8 +77,6 @@ export class Network {
   }
 
   private receiveMove(move: Move) {
-    console.log('Received move');
-
     State.get().boardState.movePiece(move);
     State.get().pieceMoved();
   }
