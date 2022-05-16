@@ -143,12 +143,11 @@ export class State {
     }
   }
 
-  kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean {
+  kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean | PieceSide {
     const newState = new BoardState(state);
     newState.movePiece(possibleMove);
 
     const kingCheckResult = this.kingInCheck(newState);
-    const ourColor = possibleMove.piece.side;
 
     if (possibleMove.piece.type == 0) {
       console.log('Check result: %s', kingCheckResult);
@@ -160,7 +159,7 @@ export class State {
       kingCheckResult == PieceSide.black ||
       kingCheckResult == PieceSide.white
     ) {
-      return kingCheckResult == ourColor;
+      return kingCheckResult;
     } else {
       return false;
     }

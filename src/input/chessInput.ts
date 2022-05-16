@@ -81,9 +81,9 @@ export class ChessInput {
           this._activePiece!.pos,
         );
 
-        // FIXME: Fix error of this not working (piece obj pos not updated?)
         for (const move of possibleMoves) {
-          if (State.get().kingInCheckWithMove(State.get().boardState, move) != State.get().ourPlayer) {
+          const checkResult = State.get().kingInCheckWithMove(State.get().boardState, move);
+          if (checkResult == false || checkResult != State.get().ourPlayer) {
             this.legalMoves.push(move);
           }
         }
