@@ -28,7 +28,11 @@ export class BoardState {
           if (origPiece == null) {
             this.pieces[x]![y] = null;
           } else {
-            this.pieces[x]![y] = new Piece(origPiece.pos, origPiece.type, origPiece.side);
+            this.pieces[x]![y] = new Piece(
+              origPiece.pos,
+              origPiece.type,
+              origPiece.side,
+            );
           }
         }
       }
@@ -102,7 +106,7 @@ export class BoardState {
 
     this.pieces[move.start.x]![move.start.y] = null;
     this.pieces[move.end.x]![move.end.y] = piece;
-    
+
     piece.pos = vec(move.end.x, move.end.y);
   }
 

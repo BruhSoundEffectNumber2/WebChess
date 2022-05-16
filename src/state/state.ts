@@ -2,7 +2,7 @@ import {vec} from 'excalibur';
 import {BoardState} from './boardState';
 import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
-import { Board } from '../scenes/board';
+import {Board} from '../scenes/board';
 
 export class State {
   private static _state: State | undefined = undefined;
@@ -109,29 +109,26 @@ export class State {
       }
     }
 
-    let whiteCheck;
-    let blackCheck;
+    let whiteCheck = false;
+    let blackCheck = false;
 
     for (const move of allLegalMoves) {
-      whiteCheck = false;
-      blackCheck = false;
-
       if (move.end.equals(whiteKingPos)) {
         // Make sure the black king isn't the one checking the white king
-        if (
+        if (!(
           move.piece.side != PieceSide.black &&
           move.piece.type != PieceType.king
-        ) {
+        )) {
           whiteCheck = true;
         }
       }
 
       if (move.end.equals(blackKingPos)) {
         // Make sure the white king isn't the one checking the black king
-        if (
+        if (!(
           move.piece.side != PieceSide.white &&
           move.piece.type != PieceType.king
-        ) {
+        )) {
           blackCheck = true;
         }
       }
@@ -152,6 +149,10 @@ export class State {
 
     const kingCheckResult = this.kingInCheck(newState);
     const ourColor = possibleMove.piece.side;
+
+    if (possibleMove.piece.type == 0) {
+      console.log('Check result: %s', kingCheckResult);
+    }
 
     if (kingCheckResult == true) {
       return true;
