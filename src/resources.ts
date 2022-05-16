@@ -1,4 +1,4 @@
-import {ImageSource, Sound} from 'excalibur';
+import {ImageSource, Random, Sound} from 'excalibur';
 
 // Chess Pieces
 import kw from './resources/images/pieces/KW.png';
@@ -16,6 +16,10 @@ import rb from './resources/images/pieces/RB.png';
 
 // Audio
 import buttonPress from './resources/audio/ui/buttonPress.ogg';
+
+import pieceMoved1 from './resources/audio/chess/pieceMoved1.ogg';
+import pieceMoved2 from './resources/audio/chess/pieceMoved2.ogg';
+import pieceMoved3 from './resources/audio/chess/pieceMoved3.ogg';
 
 /**
  * Default global resource dictionary. This gets loaded immediately
@@ -37,6 +41,25 @@ const Resources = {
   RB: new ImageSource(rb),
   // Audio
   buttonPress: new Sound(buttonPress),
+  pieceMoved1: new Sound(pieceMoved1),
+  pieceMoved2: new Sound(pieceMoved2),
+  pieceMoved3: new Sound(pieceMoved3),
 };
 
 export {Resources};
+
+export function playChessMovedSound(): void {
+  const i = new Random().integer(1, 3);
+
+  switch (i) {
+    case 1:
+      Resources.pieceMoved1.play(0.4);
+      break;
+    case 2:
+      Resources.pieceMoved2.play(0.4);
+      break;
+    case 3:
+      Resources.pieceMoved3.play(0.4);
+      break;
+  }
+}

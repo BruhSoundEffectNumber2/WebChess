@@ -1,6 +1,7 @@
 import {Input, vec} from 'excalibur';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
+import {playChessMovedSound} from '../resources';
 import {Board} from '../scenes/board';
 import {Network} from '../state/network';
 import {State} from '../state/state';
@@ -52,6 +53,8 @@ export class ChessInput {
           Network.get().sendMove(move);
           State.get().pieceMoved();
 
+          playChessMovedSound();
+
           this._activePiece = null;
           this.legalMoves = [];
 
@@ -78,6 +81,7 @@ export class ChessInput {
           this._activePiece!.pos,
         );
 
+        // FIXME: Fix error of this not working (piece obj pos not updated?)
         for (const move of possibleMoves) {
           if (!State.get().kingInCheckWithMove(State.get().boardState, move)) {
             this.legalMoves.push(move);
