@@ -3,7 +3,7 @@ import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
 import {Network} from '../state/network';
-import {State} from '../state/state';
+import {State, StateInfoOptions} from '../state/state';
 import {UIManager} from '../ui/uiManager';
 
 export class Board extends Scene {
@@ -132,6 +132,12 @@ export class Board extends Scene {
       this.add(actor);
       this.moveLocationActors.push(actor);
     });
+  }
+
+  updateInfo(stateEnum: StateInfoOptions): void {
+    // Something
+    console.log(stateEnum);
+    
   }
 
   static get(): Board {

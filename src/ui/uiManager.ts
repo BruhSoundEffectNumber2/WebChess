@@ -1,7 +1,7 @@
 import {Resources} from '../resources';
 
-export interface DecisionCallback<T1, T2 = void> {
-  (param1: T1): T2;
+export interface DecisionCallback<T1> {
+  (param1: T1): void;
 }
 
 export class UIManager {

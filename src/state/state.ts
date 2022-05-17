@@ -4,6 +4,23 @@ import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
 import {Board} from '../scenes/board';
 
+/**
+ * Contains the various actions that can happen during a the end of a turn,
+ * such as a check, checkmate, draw, or other important event. Only for 
+ * displaying the current state of the game to the user.
+ */
+export enum StateInfoOptions {
+  whiteMove,
+  blackMove,
+  whiteCheck,
+  blackCheck,
+  crossCheck,
+  whiteCheckmate,
+  blackCheckmate,
+  draw,
+  stalemate
+}
+
 export class State {
   private static _state: State | undefined = undefined;
 
