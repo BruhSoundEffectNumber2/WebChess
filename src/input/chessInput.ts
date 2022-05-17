@@ -1,6 +1,6 @@
 import {Input, vec} from 'excalibur';
 import {Move} from '../helper/move';
-import {Piece} from '../helper/piece';
+import {Piece, PieceSide} from '../helper/piece';
 import {playChessMovedSound} from '../resources';
 import {Board} from '../scenes/board';
 import {Network} from '../state/network';
@@ -82,13 +82,19 @@ export class ChessInput {
         );
 
         for (const move of possibleMoves) {
-          const checkResult = State.get().kingInCheckWithMove(State.get().boardState, move);
-          if (checkResult == false || checkResult != State.get().ourPlayer) {
+          const checkResult = State.get().kingInCheckWithMove(
+            State.get().boardState,
+            move,
+          );
+
+          if (
+            checkResult == false ||
+            ((checkResult == PieceSide.white ||
+            checkResult == PieceSide.black) && checkResult != State.get().ourPlayer)
+          ) {
             this.legalMoves.push(move);
           }
         }
-
-        console.log('----------------------');
       }
     }
 

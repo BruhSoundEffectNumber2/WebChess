@@ -149,10 +149,6 @@ export class State {
 
     const kingCheckResult = this.kingInCheck(newState);
 
-    if (possibleMove.piece.type == 0) {
-      console.log('Check result: %s', kingCheckResult);
-    }
-
     if (kingCheckResult == true) {
       return true;
     } else if (
