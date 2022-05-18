@@ -2,12 +2,16 @@ import {createServer} from 'http';
 import {Server, Socket} from 'socket.io';
 
 class Player {
-  constructor(public readonly id: string, public matched = false) {}
+  public matched = false;
+  public wantsMatch = false;
+
+  constructor(public readonly id: string) {}
 }
 
 class Match {
   constructor(
-    public readonly room: string,
+    // Also servers as the room the match is in
+    public readonly id: string,
     public readonly player1: Player,
     public readonly player2: Player,
   ) {}
@@ -18,7 +22,7 @@ class ChessServer {
   private _matches: Match[];
 
   private _httpServer;
-  private _io;
+  private _io: Server;
 
   constructor() {
     this._players = [];
@@ -33,8 +37,8 @@ class ChessServer {
     });
 
     this._io.once('connection', (socket) => {
-      this.playerEnters(socket.id);
       this.setupSocketEvents(socket);
+      this.playerEnters(socket.id);
     });
   }
 
@@ -44,15 +48,91 @@ class ChessServer {
     );
   }
 
+  private getMatchByID(id: string): Match | undefined {
+    return this._matches.find((match) => match.id == id);
+  }
+
   private getPlayerObjByID(id: string): Player | undefined {
     return this._players.find((player) => player.id == id);
   }
 
-  private endMatch(match: Match): void {/* */}
+  private addPlayer(player: Player) {
+    this._players.push(player);
+  }
 
-  private playerEnters(id: string): void {/* */}
+  private removePlayer(player: Player) {
+    this._players.splice(this._players.indexOf(player), 1);
+  }
 
-  private playerLeaves(id: string): void {/* */}
+  private addMatch(match: Match) {
+    this._matches.push(match);
+  }
+
+  private removeMatch(match: Match) {
+    this._matches.splice(this._matches.indexOf(match), 1);
+  }
+
+  private endMatch(match: Match): void {
+    const player1 = match.player1;
+    const player2 = match.player2;
+
+    this.removeMatch(match);
+    this._io.socketsLeave([player1.id, player2.id]);
+    player1.matched = false;
+    player2.matched = false;
+
+    console.log(
+      'Match %s has ended. Active matches: %d',
+      match.id,
+      this._matches.length,
+    );
+  }
+
+  /**
+   * Tries to find a match between two players.
+   * If one is found, it will automatically create the match.
+   */
+  private matchmaking() {
+    // Players that want to find a match
+    const candidates: Player[] = [];
+
+    this._players.forEach((player) => {
+      if (player.wantsMatch) {
+        candidates.push(player);
+      }
+    });
+
+    shuffle(candidates);
+  }
+
+  private playerEnters(id: string): void {
+    const player = new Player(id);
+
+    this.addPlayer(player);
+
+    console.log(
+      'Player %s has entered. Total players: %d',
+      id,
+      this._players.length,
+    );
+  }
+
+  private playerLeaves(id: string): void {
+    const player = this.getPlayerObjByID(id);
+
+    if (player == undefined) {
+      console.error('Trying to have a nonexistant player leave. Id: %s', id);
+      return;
+    }
+
+    this.removePlayer(player);
+
+    console.log(
+      'Player %s has left. Total players: %d',
+      id,
+      this._players.length,
+    );
+  }
 
   private setupSocketEvents(socket: Socket): void {
     socket.once('disconnecting', () => this.playerLeaves(socket.id));
@@ -148,3 +228,23 @@ function matchPlayers(player1: string, player2: string): void {
 
 io.listen(3000);
 console.log('Listening');
+
+function shuffle<Type>(array: Type[]): Type[] {
+  let currentIndex = array.length;
+  let randomIndex = currentIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    const temp = array[currentIndex]!;
+    array[currentIndex] = array[randomIndex]!;
+    array[randomIndex] = temp;
+  }
+
+  return array;
+}
