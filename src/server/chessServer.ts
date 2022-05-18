@@ -1,5 +1,63 @@
 import {createServer} from 'http';
-import {Server} from 'socket.io';
+import {Server, Socket} from 'socket.io';
+
+class Player {
+  constructor(public readonly id: string, public matched = false) {}
+}
+
+class Match {
+  constructor(
+    public readonly room: string,
+    public readonly player1: Player,
+    public readonly player2: Player,
+  ) {}
+}
+
+class ChessServer {
+  private _players: Player[];
+  private _matches: Match[];
+
+  private _httpServer;
+  private _io;
+
+  constructor() {
+    this._players = [];
+    this._matches = [];
+
+    // Create a WebServer that will accept data from our DevServer or our Netlify apps
+    this._httpServer = createServer();
+    this._io = new Server(httpServer, {
+      cors: {
+        origin: ['http://localhost:8080', /(?:chess-on-web\.netlify\.app)/],
+      },
+    });
+
+    this._io.once('connection', (socket) => {
+      this.playerEnters(socket.id);
+      this.setupSocketEvents(socket);
+    });
+  }
+
+  private getMatchPlayerIsIn(player: Player): Match | undefined {
+    return this._matches.find(
+      (match) => match.player1 == player || match.player2 == player,
+    );
+  }
+
+  private getPlayerObjByID(id: string): Player | undefined {
+    return this._players.find((player) => player.id == id);
+  }
+
+  private endMatch(match: Match): void {/* */}
+
+  private playerEnters(id: string): void {/* */}
+
+  private playerLeaves(id: string): void {/* */}
+
+  private setupSocketEvents(socket: Socket): void {
+    socket.once('disconnecting', () => this.playerLeaves(socket.id));
+  }
+}
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
