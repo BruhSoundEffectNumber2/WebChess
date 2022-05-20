@@ -33,10 +33,17 @@ export class Game extends Engine {
   }
 
   public startGame(ourPlayer: PieceSide) {
+    game.removeScene('mainMenu');
     game.add('board', Board.get());
     State.init(ourPlayer);
 
     game.goToScene('board');
+  }
+
+  returnToMenu() {
+    Board.destroy();
+    game.add('mainMenu', new MainMenu());
+    game.goToScene('mainMenu');
   }
 
   static get(): Game {

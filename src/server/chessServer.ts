@@ -178,7 +178,7 @@ class ChessServer {
       this.matchmaking();
     });
 
-    socket.on('matchEnd', (matchId) => {
+    socket.on('matchEnd', (matchId, victor) => {
       const match = this.getMatchByID(matchId);
 
       if (match == undefined) {

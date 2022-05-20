@@ -16,6 +16,10 @@ export class Network {
   // How many times will the socket try to connect before giving up
   private readonly maxConnectionAttempts = 3;
 
+  disconnect() {
+    this._socket.disconnect();
+  }
+
   connect() {
     this._socket = io(__ServerAddress__);
 
@@ -71,6 +75,9 @@ export class Network {
       UIManager.get().alertPopup(
         'Surrender',
         'Your opponent has decided to surrender. The match will now end.',
+        () => {
+          this.endMatch();
+        },
       );
     });
 
@@ -81,6 +88,7 @@ export class Network {
         'Accept',
         () => {
           this._socket.emit('drawAccepted', this._match);
+          this.endMatch();
         },
         'Reject',
         () => {
@@ -93,6 +101,9 @@ export class Network {
       UIManager.get().alertPopup(
         'Draw Accepted',
         'Your opponent has agreed to draw. The match will now end.',
+        () => {
+          this.endMatch();
+        },
       );
     });
 
@@ -127,11 +138,20 @@ export class Network {
     this._socket.emit('match');
   }
 
+  public sendMatchEnd(victor: number) {
+    this._socket.emit('matchEnd', victor);
+  }
+
   private matched(match: string, ourPlayer: number) {
     console.log('Matched');
 
     this._match = match;
     Game.get().startGame(ourPlayer);
+  }
+
+  private endMatch() {
+    Game.get().returnToMenu();
+    this.disconnect();
   }
 
   static get(): Network {

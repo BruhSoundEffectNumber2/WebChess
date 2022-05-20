@@ -4,6 +4,10 @@ export interface DecisionCallback<T1> {
   (param1: T1): void;
 }
 
+export interface AcknowledgeCallback {
+  (): void;
+}
+
 export class UIManager {
   static manager: UIManager | undefined = undefined;
   private _ui: HTMLElement;
@@ -24,7 +28,7 @@ export class UIManager {
 
   sceneActivated(name: string): void {
     if (this._currentClasses[this._currentClasses.indexOf(name)] != null) {
-      throw new Error('Trying to create a duplicate class on UI element.');
+      console.error('Trying to create a duplicate class on UI element.');
     }
 
     this._currentClasses.push(name);
@@ -33,20 +37,26 @@ export class UIManager {
 
   sceneDeactivated(name: string): void {
     if (this._currentClasses[this._currentClasses.indexOf(name)] == null) {
-      throw new Error(
+      console.error(
         'Trying to remove a class that does not exist from UI element.',
       );
     }
 
     this.ui.classList.remove(name);
     this.ui.innerHTML = '';
+
+    console.log(this.ui.classList);
   }
 
   playButtonClickAudio(): void {
     Resources.buttonPress.play(0.1);
   }
 
-  errorPopup(headerText: string, bodyText: string) {
+  errorPopup(
+    headerText: string,
+    bodyText: string,
+    callback?: AcknowledgeCallback,
+  ) {
     const base = document.createElement('div');
     base.classList.add('popup');
 
@@ -76,10 +86,18 @@ export class UIManager {
       header.remove();
       body.remove();
       acknowledgement.remove();
+
+      if (callback) {
+        callback();
+      }
     };
   }
 
-  alertPopup(headerText: string, bodyText: string) {
+  alertPopup(
+    headerText: string,
+    bodyText: string,
+    callback?: AcknowledgeCallback,
+  ) {
     const base = document.createElement('div');
     base.classList.add('popup');
 
@@ -109,6 +127,10 @@ export class UIManager {
       header.remove();
       body.remove();
       acknowledgement.remove();
+
+      if (callback) {
+        callback();
+      }
     };
   }
 

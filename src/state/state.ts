@@ -180,11 +180,11 @@ export class State {
 
   // Singleton creation and getting
   static init(ourPlayer: PieceSide): void {
-    if (this._state) {
-      throw new Error('Cannot create the state more than once.');
-    }
-
     this._state = new State(ourPlayer);
+  }
+
+  static stateInitialized(): boolean {
+    return this._state != undefined;
   }
 
   static get(): State {

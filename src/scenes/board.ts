@@ -1,4 +1,5 @@
 import {Actor, Color, Rectangle, Scene, vec, Vector} from 'excalibur';
+import { Game } from '..';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
@@ -146,5 +147,10 @@ export class Board extends Scene {
     }
 
     return this._board;
+  }
+
+  static destroy(): void {
+    Game.get().removeScene('board');
+    
   }
 }
