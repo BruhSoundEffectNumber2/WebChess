@@ -1,5 +1,6 @@
 import {createServer} from 'http';
 import {Server, Socket} from 'socket.io';
+import {v4 as uuidv4} from 'uuid';
 
 class Player {
   public matched = false;
@@ -30,16 +31,21 @@ class ChessServer {
 
     // Create a WebServer that will accept data from our DevServer or our Netlify apps
     this._httpServer = createServer();
-    this._io = new Server(httpServer, {
+    this._io = new Server(this._httpServer, {
       cors: {
         origin: ['http://localhost:8080', /(?:chess-on-web\.netlify\.app)/],
       },
     });
 
-    this._io.once('connection', (socket) => {
+    this._io.on('connection', (socket) => {
       this.setupSocketEvents(socket);
       this.playerEnters(socket.id);
     });
+  }
+
+  startListening() {
+    this._io.listen(3000);
+    console.log('Listening on port 3000');
   }
 
   private getMatchPlayerIsIn(player: Player): Match | undefined {
@@ -77,7 +83,7 @@ class ChessServer {
     const player2 = match.player2;
 
     this.removeMatch(match);
-    this._io.socketsLeave([player1.id, player2.id]);
+    this._io.socketsLeave(match.id);
     player1.matched = false;
     player2.matched = false;
 
@@ -102,7 +108,32 @@ class ChessServer {
       }
     });
 
+    if (candidates.length < 2) {
+      // Cannot match with less than two people matching
+      return;
+    }
+
     shuffle(candidates);
+
+    const match = new Match(uuidv4(), candidates[0]!, candidates[1]!);
+    this.addMatch(match);
+
+    match.player1.wantsMatch = false;
+    match.player1.matched = true;
+
+    match.player2.wantsMatch = false;
+    match.player2.matched = true;
+
+    this._io.to(match.player1.id).emit('matched', match.id, 0);
+    this._io.to(match.player2.id).emit('matched', match.id, 1);
+
+    this._io.in([match.player1.id, match.player2.id]).socketsJoin(match.id);
+
+    console.log(
+      'Match %s has started. Active matches: %d',
+      match.id,
+      this._matches.length,
+    );
   }
 
   private playerEnters(id: string): void {
@@ -136,98 +167,80 @@ class ChessServer {
 
   private setupSocketEvents(socket: Socket): void {
     socket.once('disconnecting', () => this.playerLeaves(socket.id));
+
+    socket.on('match', () => {
+      const player = this.getPlayerObjByID(socket.id);
+      if (player == undefined) {
+        return;
+      }
+
+      player.wantsMatch = true;
+      this.matchmaking();
+    });
+
+    socket.on('matchEnd', (matchId) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      this.endMatch(match);
+    });
+
+    socket.on('move', (matchId, move) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      socket.to(match.id).emit('move', move);
+    });
+
+    socket.on('surrender', (matchId) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      socket.to(match.id).emit('surrender');
+      this.endMatch(match);
+    });
+
+    socket.on('offerDraw', (matchId) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      socket.to(match.id).emit('offerDraw');
+    });
+
+    socket.on('drawAccepted', (matchId) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      socket.to(match.id).emit('drawAccepted');
+      this.endMatch(match);
+    });
+
+    socket.on('drawRejected', (matchId) => {
+      const match = this.getMatchByID(matchId);
+
+      if (match == undefined) {
+        return;
+      }
+
+      socket.to(match.id).emit('drawRejected');
+    });
   }
 }
-
-const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: ['http://localhost:8080', /(?:chess-on-web\.netlify\.app)/],
-  },
-});
-
-const matchingPlayers: string[] = [];
-const activeMatches: string[] = [];
-
-io.on('connection', (socket) => {
-  console.log('A user connected. Active users: ' + io.engine.clientsCount);
-
-  socket.once('disconnect', () => {
-    console.log('A user disconnected. Active users: ' + io.engine.clientsCount);
-
-    matchingPlayers.splice(matchingPlayers.indexOf(socket.id), 1);
-  });
-
-  socket.on('match', () => {
-    matchingPlayers.push(socket.id);
-
-    tryToMatchPlayers();
-  });
-
-  socket.on('matchEnd', () => {
-    // End of match behavior, scoring, ranking, etc
-  });
-
-  socket.on('move', (match, move) => {
-    socket.to(match).emit('move', move);
-  });
-
-  socket.on('surrender', (match) => {
-    socket.to(match).emit('surrender');
-  });
-
-  socket.on('offerDraw', (match) => {
-    socket.to(match).emit('offerDraw');
-  });
-
-  socket.on('drawAccepted', (match) => {
-    socket.to(match).emit('drawAccepted');
-  });
-
-  socket.on('drawRejected', (match) => {
-    socket.to(match).emit('drawRejected');
-  });
-});
-
-function tryToMatchPlayers(): void {
-  if (matchingPlayers.length < 2) {
-    console.log(
-      'Tried to match players, but there was nobody to match them with.',
-    );
-    return;
-  }
-
-  if (matchingPlayers.length == 2) {
-    matchPlayers(matchingPlayers[0]!, matchingPlayers[1]!);
-    return;
-  }
-
-  // TODO: Matchmaking from a large pool of players
-}
-
-function matchPlayers(player1: string, player2: string): void {
-  console.log('Matching players ' + player1 + ' and ' + player2);
-
-  // Remove players from matching list
-  const player1Index = matchingPlayers.indexOf(player1);
-  matchingPlayers.splice(player1Index, 1);
-
-  const player2Index = matchingPlayers.indexOf(player2);
-  matchingPlayers.splice(player2Index, 1);
-
-  // Create a room for the players
-  const match: string = io.engine.generateId();
-  activeMatches.push(match);
-
-  io.to(player1).emit('matched', match, 0);
-  io.to(player2).emit('matched', match, 1);
-
-  io.to(player1).socketsJoin(match);
-  io.to(player2).socketsJoin(match);
-}
-
-io.listen(3000);
-console.log('Listening');
 
 function shuffle<Type>(array: Type[]): Type[] {
   let currentIndex = array.length;
@@ -235,7 +248,6 @@ function shuffle<Type>(array: Type[]): Type[] {
 
   // While there remain elements to shuffle.
   while (currentIndex != 0) {
-
     // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -248,3 +260,5 @@ function shuffle<Type>(array: Type[]): Type[] {
 
   return array;
 }
+
+new ChessServer().startListening();
