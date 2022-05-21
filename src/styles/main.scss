@@ -1,129 +1,145 @@
 $font-stack: Helvetica, sans-serif;
-$background1: rgb(45, 45, 45);
-$background2: rgb(30, 30, 30);
-$errorColor: rgb(255, 50, 0);
-$buttonHoverColor: rgb(255, 150, 0);
-$baseColor: aliceblue;
-$game-width: 900px;
-$game-height: 600px;
-$default-transition-duration: 100ms;
+$transition-short: 100ms;
 
-/* Global mixins */
-@mixin anchorCenter {
+/* Color Palette */
+$palette-jet: hsl(120, 2, 20);
+$palette-eerieBlack: hsl(60, 1, 14);
+$palette-maizeCrayola: hsl(44, 88, 66);
+$palette-alabaster: hsl(81, 28, 90);
+$palette-gainsboro: hsl(150, 14, 84);
+$palette-imperialRed: hsl(352, 93, 53);
+
+/* Global Mixins */
+@mixin absolute-centered {
   transform: translate(-50%, -50%);
-}
-
-@mixin center {
-  @include anchorCenter();
   position: absolute;
-  top: 50%;
-  left: 50%;
 }
 
-/* Root and UI elements */
+@mixin position-center {
+  left: 50%;
+  top: 50%;
+}
+
+@mixin border-rounded {
+  border-radius: 0.25rem;
+  border: 1px solid $palette-alabaster;
+}
+
+@mixin button-base {
+  @include border-rounded();
+
+  font: 100% $font-stack;
+  padding: 0.5rem;
+  color: $palette-eerieBlack;
+  border-color: $palette-eerieBlack;
+  transition-duration: $transition-short;
+  background-color: $palette-alabaster;
+  box-shadow: 2px 2px 2px transparentize($palette-eerieBlack, 0.7);
+
+  &:hover:enabled {
+    background-color: $palette-maizeCrayola;
+  }
+
+  &:disabled {
+    background-color: desaturate($palette-maizeCrayola, 50);
+  }
+}
+
+@mixin popup {
+}
+
+/* Root UI */
 body {
   font: 100% $font-stack;
-  color: $baseColor;
-  background-color: $background2;
+  margin: 0;
   padding: 0;
+  background-color: $palette-eerieBlack;
+  color: $palette-alabaster;
 }
 
-.game-name {
-  padding: 0;
-  font-size: 24pt;
+h1 {
+  &.game-name {
+    @include absolute-centered();
+
+    left: 50%;
+    top: 10%;
+    font-size: 300%;
+  }
+
+  margin: 0;
+  color: $palette-alabaster;
+  font: 200% $font-stack;
 }
 
-#root {
+/* Root is a flexbox around the game container. */
+div#root {
   position: relative;
-}
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 
-#root #ui {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: $game-width;
-  height: $game-height;
-}
+  div#game-container {
+    position: relative;
+    display: grid;
 
-/* Main Menu */
-div#ui.mainMenu button.button--start {
-  @include center();
+    /* Allows the window and ui to be centered together. */
+    canvas#game {
+      @include border-rounded();
 
-  background-color: $background1;
-  border: 0;
-  color: $baseColor;
-  width: 140px;
-  height: 40px;
-  transition-duration: $default-transition-duration;
-}
+      grid-column: 1;
+      grid-row: 1;
+      position: relative;
+    }
 
-div#ui.mainMenu button.button--start:hover {
-  background: $buttonHoverColor;
-  color: black;
+    div#ui {
+      grid-column: 1;
+      grid-row: 1;
+      position: relative;
+    }
+  }
 }
 
 /* Popups */
-@mixin popup-header {
-  font: 125% $font-stack;
-  margin: 0;
-  color: $baseColor;
-  border-bottom: 1px solid white;
-  height: 25px;
-}
+div.popup {
+  @include absolute-centered();
+  @include position-center();
+  @include border-rounded();
 
-@mixin button {
-  margin: 2px 5% 2px 5%;
-  height: 26px;
-  background-color: $background1;
-  border: 0;
-  color: $baseColor;
-  transition-duration: $default-transition-duration;
-}
+  width: 25%;
+  height: 35%;
+  background-color: $palette-eerieBlack;
 
-@mixin button-hover {
-  background-color: $buttonHoverColor;
-  color: black;
-}
+  p.header {
+    margin: 0;
+    padding: 2%;
+    font-size: 140%;
+    height: 13%;
 
-div#ui div.popup {
-  @include center();
+    &--error {
+      @extend .header;
+      color: $palette-imperialRed;
+    }
+  }
 
-  border: 2px solid $background1;
-  background: $background2;
-  width: 200px;
-  height: 150px;
-}
+  p.body {
+    margin: 0;
+    padding: 2%;
+    border-top: 2px solid $palette-alabaster;
+    border-bottom: 2px solid $palette-alabaster;
+    height: 60%;
+  }
 
-div#ui div.popup p.header {
-  @include popup-header();
-}
+  div.options-holder {
+    display: flex;
+    justify-content: space-around;
+    height: 17%;
 
-div#ui div.popup p.body {
-  font: 90% $font-stack;
-  margin: 5px 2px 5px 2px;
-  height: 84px;
-}
-
-div#ui div.popup button.option {
-  @include button();
-  width: 40%;
-}
-
-div#ui div.popup button.option:hover {
-  @include button-hover();
-}
-
-/* Error */
-div#ui div.popup p.error--header {
-  @include popup-header();
-  color: $errorColor;
-}
-
-div#ui div.popup button.error--option {
-  @include button();
-  width: 90%;
-}
-
-div#ui div.popup button.error--option:hover {
-  @include button-hover();
+    button.option {
+      @include button-base();
+  
+      flex-grow: 1;
+      margin: 1.5% 1%;
+    }
+  }
 }

@@ -44,8 +44,6 @@ export class UIManager {
 
     this.ui.classList.remove(name);
     this.ui.innerHTML = '';
-
-    console.log(this.ui.classList);
   }
 
   playButtonClickAudio(): void {
@@ -61,18 +59,22 @@ export class UIManager {
     base.classList.add('popup');
 
     const header = document.createElement('p');
-    header.classList.add('error--header');
+    header.classList.add('header--error');
 
     const body = document.createElement('p');
     body.classList.add('body');
 
+    const optionsHolder = document.createElement('div');
+    optionsHolder.classList.add('options-holder');
+
     const acknowledgement = document.createElement('button');
-    acknowledgement.classList.add('error--option');
+    acknowledgement.classList.add('option');
 
     this._ui.appendChild(base);
     base.appendChild(header);
     base.appendChild(body);
-    base.appendChild(acknowledgement);
+    base.appendChild(optionsHolder);
+    optionsHolder.appendChild(acknowledgement);
 
     header.textContent = headerText;
     body.textContent = bodyText;
@@ -86,6 +88,7 @@ export class UIManager {
       header.remove();
       body.remove();
       acknowledgement.remove();
+      optionsHolder.remove();
 
       if (callback) {
         callback();
@@ -107,13 +110,17 @@ export class UIManager {
     const body = document.createElement('p');
     body.classList.add('body');
 
+    const optionsHolder = document.createElement('div');
+    optionsHolder.classList.add('options-holder');
+
     const acknowledgement = document.createElement('button');
-    acknowledgement.classList.add('error--option');
+    acknowledgement.classList.add('option');
 
     this._ui.appendChild(base);
     base.appendChild(header);
     base.appendChild(body);
-    base.appendChild(acknowledgement);
+    base.appendChild(optionsHolder);
+    optionsHolder.appendChild(acknowledgement);
 
     header.textContent = headerText;
     body.textContent = bodyText;
@@ -127,6 +134,7 @@ export class UIManager {
       header.remove();
       body.remove();
       acknowledgement.remove();
+      optionsHolder.remove();
 
       if (callback) {
         callback();
@@ -151,6 +159,9 @@ export class UIManager {
     const body = document.createElement('p');
     body.classList.add('body');
 
+    const optionsHolder = document.createElement('div');
+    optionsHolder.classList.add('options-holder');
+
     const option1 = document.createElement('button');
     option1.classList.add('option');
 
@@ -160,8 +171,9 @@ export class UIManager {
     this._ui.appendChild(base);
     base.appendChild(header);
     base.appendChild(body);
-    base.appendChild(option1);
-    base.appendChild(option2);
+    base.appendChild(optionsHolder);
+    optionsHolder.appendChild(option1);
+    optionsHolder.appendChild(option2);
 
     header.textContent = headerText;
     body.textContent = bodyText;
@@ -178,6 +190,7 @@ export class UIManager {
       body.remove();
       option1.remove();
       option2.remove();
+      optionsHolder.remove();
     };
 
     option2.onclick = (e) => {
@@ -190,6 +203,7 @@ export class UIManager {
       body.remove();
       option1.remove();
       option2.remove();
+      optionsHolder.remove();
     };
   }
 

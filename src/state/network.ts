@@ -125,6 +125,7 @@ export class Network {
 
   surrender(): void {
     this._socket.emit('surrender', this._match);
+    this.endMatch();
   }
 
   private receiveMove(move: Move) {

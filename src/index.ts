@@ -1,5 +1,6 @@
 // The stylesheet has to be imported into index so it can be found by Webpack
 import './styles/main.scss';
+import './styles/mainMenu.scss';
 import './styles/board.scss';
 
 import {Engine, Input, Loader} from 'excalibur';
@@ -9,6 +10,7 @@ import {Board} from './scenes/board';
 import {State} from './state/state';
 import {MainMenu} from './scenes/mainMenu';
 import {PieceSide} from './helper/piece';
+import {UIManager} from './ui/uiManager';
 
 export class Game extends Engine {
   static _game: Game | undefined = undefined;
@@ -59,6 +61,10 @@ const game = Game.get();
 
 game.start().then(() => {
   game.goToScene('mainMenu');
+  UIManager.get().errorPopup(
+    'Header',
+    'This is some text that we might see in a popup of this kind. It will probably be long enough to wrap.',
+  );
 });
 
 game.input.pointers.primary.on('up', function (event) {
@@ -68,8 +74,8 @@ game.input.pointers.primary.on('up', function (event) {
     event.coordinates.pagePos.y,
   );
 
-  // Look through the list of elements, if the UI is first, allow the input to continue
-  if (elementsOver[0]?.id != 'ui') {
+  // Look through the list of elements, if the UI is second, allow the input to continue
+  if (elementsOver[1]?.id != 'ui') {
     return;
   }
 
