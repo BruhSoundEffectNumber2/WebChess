@@ -54,6 +54,9 @@ export class Board extends Scene {
     info.className = 'info';
     info.textContent = 'Default Text Content';
 
+    const buttonHolder = document.createElement('div');
+    buttonHolder.className = 'button-holder';
+
     const surrender = document.createElement('button');
     surrender.className = 'surrender';
     surrender.textContent = 'Surrender';
@@ -80,8 +83,9 @@ export class Board extends Scene {
 
     UIManager.get().ui.appendChild(bg);
     bg.appendChild(info);
-    bg.appendChild(surrender);
-    bg.appendChild(offerDraw);
+    bg.appendChild(buttonHolder);
+    buttonHolder.appendChild(surrender);
+    buttonHolder.appendChild(offerDraw);
 
     this.pieceActors = [];
     this.moveLocationActors = [];
