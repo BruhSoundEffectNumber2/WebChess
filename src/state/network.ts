@@ -3,7 +3,6 @@ import {io, Socket} from 'socket.io-client';
 import {Game} from '..';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
-import {MainMenu} from '../scenes/mainMenu';
 import {UIManager} from '../ui/uiManager';
 import {State} from './state';
 
@@ -21,7 +20,7 @@ export class Network {
   }
 
   connect() {
-    this._socket = io(__ServerAddress__);
+    this._socket = io(__ServerAddress__, {query: {version: __AppVersion__}});
 
     this._socket.on('connect', () => {
       console.log('Connected to server.');
@@ -39,11 +38,11 @@ export class Network {
         UIManager.get().errorPopup(
           'Connection Error',
           'There was an error when connecting to the server, and all retry attempts failed.',
+          () => {
+            Game.get().returnToMenu();
+          },
         );
         this._socket.disconnect();
-        if (Game.get().scenes['mainMenu']?.isCurrentScene) {
-          (Game.get().currentScene as MainMenu).reset();
-        }
         this._connectionAttempts = 0;
       }
     });
@@ -54,6 +53,16 @@ export class Network {
 
     this._socket.on('matched', (match: string, ourPlayer: number) => {
       this.matched(match, ourPlayer);
+    });
+
+    this._socket.on('matchError', () => {
+      UIManager.get().errorPopup(
+        'Match Error',
+        'An unexpected error has occurred and the match is unable to continue. The match will now end.',
+        () => {
+          this.endMatch();
+        },
+      );
     });
 
     this._socket.on('move', (move) => {
@@ -111,6 +120,17 @@ export class Network {
       UIManager.get().alertPopup(
         'Draw Rejected',
         'Your opponent has not agreed to draw. The match will continue.',
+      );
+    });
+
+    this._socket.on('wrongVersion', () => {
+      UIManager.get().errorPopup(
+        'Wrong Version',
+        `The game and the server are on different versions and cannot connect. 
+        Try waiting and refreshing the page to get the updated version.`,
+        () => {
+          Game.get().returnToMenu();
+        },
       );
     });
   }

@@ -7,7 +7,7 @@ import {Engine, Input, Loader} from 'excalibur';
 import {ChessInput} from './input/chessInput';
 import {Resources} from './resources';
 import {Board} from './scenes/board';
-import {State} from './state/state';
+import {State, StateInfoOptions} from './state/state';
 import {MainMenu} from './scenes/mainMenu';
 import {PieceSide} from './helper/piece';
 
@@ -39,10 +39,15 @@ export class Game extends Engine {
     State.init(ourPlayer);
 
     game.goToScene('board');
+    Board.get().updateInfo([StateInfoOptions.whiteMove]);
   }
 
   returnToMenu() {
     Board.destroy();
+    if (game.scenes['mainMenu'] != undefined) {
+      game.removeScene('mainMenu');
+    }
+
     game.add('mainMenu', new MainMenu());
     game.goToScene('mainMenu');
   }
@@ -61,6 +66,7 @@ const game = Game.get();
 game.start().then(() => {
   game.goToScene('mainMenu');
 });
+
 
 game.input.pointers.primary.on('up', function (event) {
   // We should stop the input from proceeding if we are over a child of the ui

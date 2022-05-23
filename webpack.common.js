@@ -3,6 +3,7 @@ const path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -57,6 +58,9 @@ module.exports = {
       title: 'Web Chess',
       filename: 'index.html',
       template: 'src/template.html',
+    }),
+    new webpack.DefinePlugin({
+      __AppVersion__: JSON.stringify(process.env.npm_package_version),
     }),
   ],
 };

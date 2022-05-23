@@ -34,14 +34,14 @@ $palette-imperialRed: hsl(352, 93, 53);
   border-color: $palette-eerieBlack;
   transition-duration: $transition-short;
   background-color: $palette-alabaster;
-  box-shadow: 2px 2px 2px transparentize($palette-eerieBlack, 0.7);
+  box-shadow: 2px 2px 2px transparentize($palette-eerieBlack, 0.7%);
 
   &:hover:enabled {
     background-color: $palette-maizeCrayola;
   }
 
   &:disabled {
-    background-color: desaturate($palette-maizeCrayola, 50);
+    background-color: desaturate($palette-maizeCrayola, 50%);
   }
 }
 
@@ -55,6 +55,20 @@ body {
   padding: 0;
   background-color: $palette-eerieBlack;
   color: $palette-alabaster;
+  height: 100vh;
+}
+
+footer {
+  height: auto;
+  text-align: center;
+
+  a {
+    color: $palette-alabaster;
+
+    &:visited {
+      color: $palette-gainsboro;
+    }
+  }
 }
 
 h1 {
@@ -62,7 +76,7 @@ h1 {
     @include absolute-centered();
 
     left: 50%;
-    top: 10%;
+    top: 5%;
     font-size: 300%;
   }
 
@@ -77,7 +91,7 @@ div#root {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 95%;
 
   div#game-container {
     position: relative;

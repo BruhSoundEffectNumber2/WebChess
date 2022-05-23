@@ -2,6 +2,9 @@ import {createServer} from 'http';
 import {Server, Socket} from 'socket.io';
 import {v4 as uuidv4} from 'uuid';
 
+/* The server and app versions must match exactly, else a wrongVersion error will occur. */
+const serverVersion = '0.1.2';
+
 class Player {
   public matched = false;
   public wantsMatch = false;
@@ -38,6 +41,21 @@ class ChessServer {
     });
 
     this._io.on('connection', (socket) => {
+      // Check for version compatibility (major and minor must match)
+      if (socket.handshake.query['version']) {
+        const appVer = (socket.handshake.query['version'] as string).split('.');
+        const serVer = serverVersion.split('.');
+
+        if (!(serVer[0] == appVer[0] && serVer[1] == appVer[1])) {
+          socket.emit('wrongVersion');
+          socket.disconnect(true);
+          return;
+        }
+      } else {
+        console.error('Client did not send its version to server.');
+        return;
+      }
+
       this.setupSocketEvents(socket);
       this.playerEnters(socket.id);
     });
@@ -45,6 +63,7 @@ class ChessServer {
 
   startListening() {
     this._io.listen(3000);
+    console.log('Server Version: %s', serverVersion);
     console.log('Listening on port 3000');
   }
 
@@ -154,6 +173,16 @@ class ChessServer {
     if (player == undefined) {
       console.error('Trying to have a nonexistant player leave. Id: %s', id);
       return;
+    }
+
+    // Check to see if the player is in a match
+    const match = this.getMatchPlayerIsIn(player);
+
+    if (match != undefined) {
+      // TODO: Grace period for the client reconnecting and resuming the match
+      // The match does exist, so we need to end it as an error
+      this._io.to(match.id).emit('matchError');
+      this.endMatch(match);
     }
 
     this.removePlayer(player);

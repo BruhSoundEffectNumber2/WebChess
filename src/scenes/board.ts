@@ -1,8 +1,9 @@
 import {Actor, Color, Rectangle, Scene, vec, Vector} from 'excalibur';
-import { Game } from '..';
+import {Game} from '..';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
+import {PieceSide} from '../helper/piece';
 import {Network} from '../state/network';
 import {State, StateInfoOptions} from '../state/state';
 import {UIManager} from '../ui/uiManager';
@@ -12,6 +13,8 @@ export class Board extends Scene {
 
   private pieceActors!: PieceActor[];
   private moveLocationActors!: MoveLocationActor[];
+
+  private _info!: HTMLParagraphElement;
 
   override onActivate(): void {
     UIManager.get().sceneActivated('board');
@@ -50,9 +53,9 @@ export class Board extends Scene {
     const bg = document.createElement('div');
     bg.className = 'bg';
 
-    const info = document.createElement('p');
-    info.className = 'info';
-    info.textContent = 'Default Text Content';
+    this._info = document.createElement('p');
+    this._info.className = 'info';
+    this._info.textContent = 'Default Text Content';
 
     const buttonHolder = document.createElement('div');
     buttonHolder.className = 'button-holder';
@@ -65,11 +68,13 @@ export class Board extends Scene {
         'Are You Sure?',
         'Are you sure you want to surrender? The match will count as a loss.',
         'Go Back',
-        () => {/* Don't surrender */},
+        () => {
+          /* Don't surrender */
+        },
         'Surrender',
         () => {
           Network.get().surrender();
-        }
+        },
       );
     };
 
@@ -82,7 +87,7 @@ export class Board extends Scene {
     };
 
     UIManager.get().ui.appendChild(bg);
-    bg.appendChild(info);
+    bg.appendChild(this._info);
     bg.appendChild(buttonHolder);
     buttonHolder.appendChild(surrender);
     buttonHolder.appendChild(offerDraw);
@@ -139,10 +144,25 @@ export class Board extends Scene {
     });
   }
 
-  updateInfo(stateEnum: StateInfoOptions): void {
-    // Something
-    console.log(stateEnum);
+  updateInfo(stateEnums: StateInfoOptions[]): void {
+    this._info.textContent = '';
     
+    for (const state of stateEnums) {
+      switch (state) {
+        case StateInfoOptions.whiteMove: {
+          this._info.textContent += 'White to Move <br/>';
+          break;
+        }
+        case StateInfoOptions.blackMove: {
+          this._info.textContent += 'Black to Move <br/>';
+          break;
+        }
+        default: {
+          this._info.textContent += 'Invalid State Info <br/>';
+          break;
+        }
+      }
+    }
   }
 
   static get(): Board {
@@ -154,7 +174,10 @@ export class Board extends Scene {
   }
 
   static destroy(): void {
+    if (Game.get().scenes['board'] == undefined) {
+      return;
+    }
+
     Game.get().removeScene('board');
-    
   }
 }

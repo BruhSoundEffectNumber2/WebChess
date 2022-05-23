@@ -6,7 +6,7 @@ import {Board} from '../scenes/board';
 
 /**
  * Contains the various actions that can happen during a the end of a turn,
- * such as a check, checkmate, draw, or other important event. Only for 
+ * such as a check, checkmate, draw, or other important event. Only for
  * displaying the current state of the game to the user.
  */
 export enum StateInfoOptions {
@@ -18,7 +18,7 @@ export enum StateInfoOptions {
   whiteCheckmate,
   blackCheckmate,
   draw,
-  stalemate
+  stalemate,
 }
 
 export class State {
@@ -63,8 +63,16 @@ export class State {
   }
 
   turnMade(): void {
+    const state: StateInfoOptions[] = [];
+
     this._playerTurn =
       this._playerTurn == PieceSide.white ? PieceSide.black : PieceSide.white;
+
+    if (this._playerTurn == PieceSide.white) {
+      state.push(StateInfoOptions.whiteMove);
+    } else {
+      state.push(StateInfoOptions.blackMove);
+    }
 
     this._turnCount++;
 
@@ -72,20 +80,16 @@ export class State {
 
     this._check = this.kingInCheck(this._boardState);
     if (this._check != undefined) {
-      if (this._check == true) {
-        if (this.inCheckmate(this._boardState, PieceSide.white)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
-
-        if (this.inCheckmate(this._boardState, PieceSide.black)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
-      } else {
-        if (this.inCheckmate(this._boardState, this._check as PieceSide)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
+      if (this._check == PieceSide.white) {
+        state.push(StateInfoOptions.whiteCheck);
+      } else if (this._check == PieceSide.black) {
+        state.push(StateInfoOptions.blackCheck);
+      } else if (this._check == true) {
+        state.push(StateInfoOptions.crossCheck);
       }
     }
+
+    Board.get().updateInfo(state);
   }
 
   inCheckmate(state: BoardState, ourColor: PieceSide): boolean {
@@ -132,20 +136,24 @@ export class State {
     for (const move of allLegalMoves) {
       if (move.end.equals(whiteKingPos)) {
         // Make sure the black king isn't the one checking the white king
-        if (!(
-          move.piece.side != PieceSide.black &&
-          move.piece.type != PieceType.king
-        )) {
+        if (
+          !(
+            move.piece.side != PieceSide.black &&
+            move.piece.type != PieceType.king
+          )
+        ) {
           whiteCheck = true;
         }
       }
 
       if (move.end.equals(blackKingPos)) {
         // Make sure the white king isn't the one checking the black king
-        if (!(
-          move.piece.side != PieceSide.white &&
-          move.piece.type != PieceType.king
-        )) {
+        if (
+          !(
+            move.piece.side != PieceSide.white &&
+            move.piece.type != PieceType.king
+          )
+        ) {
           blackCheck = true;
         }
       }
@@ -160,7 +168,10 @@ export class State {
     }
   }
 
-  kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean | PieceSide {
+  kingInCheckWithMove(
+    state: BoardState,
+    possibleMove: Move,
+  ): boolean | PieceSide {
     const newState = new BoardState(state);
     newState.movePiece(possibleMove);
 
