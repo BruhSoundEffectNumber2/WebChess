@@ -74,17 +74,17 @@ div#root {
   display: grid;
   width: 100vw;
   height: 100vh;
-  grid-template-columns: [le] 10% [cle] 80% [cre] 10% [re];
+  grid-template-columns: [le] 100% [re];
   grid-template-rows: [le] 10% [cte] 80% [cbe] 10% [be];
 
   div#game-container {
+    margin: auto;
     position: relative;
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
     display: grid;
     height: 100%;
     width: 100%;
-    justify-content: center;
     grid-template-columns: [le] 100% [re];
     grid-template-rows: [te] 100% [be];
   
