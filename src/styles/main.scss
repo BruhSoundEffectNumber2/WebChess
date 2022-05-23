@@ -55,11 +55,10 @@ body {
   padding: 0;
   background-color: $palette-eerieBlack;
   color: $palette-alabaster;
-  height: 100vh;
 }
 
 footer {
-  height: auto;
+  height: 5%;
   text-align: center;
 
   a {
@@ -71,41 +70,33 @@ footer {
   }
 }
 
-h1 {
-  &.game-name {
-    @include absolute-centered();
-
-    left: 50%;
-    top: 5%;
-    font-size: 300%;
-  }
-
-  margin: 0;
-  color: $palette-alabaster;
-  font: 200% $font-stack;
-}
-
-/* Root is a flexbox around the game container. */
 div#root {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 95%;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-columns: [le] 10% [cle] 80% [cre] 10% [re];
+  grid-template-rows: [le] 10% [cte] 80% [cbe] 10% [be];
 
   div#game-container {
     position: relative;
+    grid-column: 2;
+    grid-row: 2;
     display: grid;
-
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    grid-template-columns: [le] 100% [re];
+    grid-template-rows: [te] 100% [be];
+  
     /* Allows the window and ui to be centered together. */
     canvas#game {
       @include border-rounded();
-
+  
       grid-column: 1;
       grid-row: 1;
       position: relative;
     }
-
+  
     div#ui {
       grid-column: 1;
       grid-row: 1;
@@ -151,7 +142,7 @@ div.popup {
 
     button.option {
       @include button-base();
-  
+
       flex-grow: 1;
       margin: 1.5% 1%;
     }
