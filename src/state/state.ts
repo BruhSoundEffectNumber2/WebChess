@@ -80,12 +80,21 @@ export class State {
 
     this._check = this.kingInCheck(this._boardState);
     if (this._check != undefined) {
+      // Check
       if (this._check == PieceSide.white) {
         state.push(StateInfoOptions.whiteCheck);
       } else if (this._check == PieceSide.black) {
         state.push(StateInfoOptions.blackCheck);
       } else if (this._check == true) {
         state.push(StateInfoOptions.crossCheck);
+      }
+
+      // Checkmate
+      // TODO: Have this actually end the game
+      if (this.inCheckmate(this._boardState, PieceSide.white)) {
+        state.push(StateInfoOptions.whiteCheckmate);
+      } else if (this.inCheckmate(this._boardState, PieceSide.black)) {
+        state.push(StateInfoOptions.blackCheckmate);
       }
     }
 
@@ -98,18 +107,22 @@ export class State {
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
         const piece = state.getPiece(vec(x, y));
 
-        if (piece && piece.side == ourColor) {
-          ourLegalMoves.push(...legalMoves);
+        if (piece == null || piece.side != ourColor) {
+          continue;
         }
+
+        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+        ourLegalMoves.push(...legalMoves);
       }
     }
 
     // If there is even one possible move to get us out of check, we are not in checkmate
     for (const ourMove of ourLegalMoves) {
-      if (!this.kingInCheckWithMove(state, ourMove)) {
+      const isCheck = this.kingInCheckWithMove(state, ourMove);
+      // FIXME: Cannot handle results of function
+      if (isCheck == undefined) {
         return false;
       }
     }

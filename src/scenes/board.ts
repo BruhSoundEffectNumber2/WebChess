@@ -146,19 +146,53 @@ export class Board extends Scene {
 
   updateInfo(stateEnums: StateInfoOptions[]): void {
     this._info.textContent = '';
-    
+
     for (const state of stateEnums) {
+      // For the players sake, tell them that THEY need to move, not just the color
+      this._info.textContent +=
+        State.get().ourPlayer == State.get().playerTurn
+          ? '(You) '
+          : '(Opponent) ';
+
       switch (state) {
         case StateInfoOptions.whiteMove: {
-          this._info.textContent += 'White to Move <br/>';
+          this._info.textContent += 'White to Move\r\n';
           break;
         }
         case StateInfoOptions.blackMove: {
-          this._info.textContent += 'Black to Move <br/>';
+          this._info.textContent += 'Black to Move\r\n';
+          break;
+        }
+        case StateInfoOptions.whiteCheck: {
+          this._info.textContent += 'White in Check\r\n';
+          break;
+        }
+        case StateInfoOptions.blackCheck: {
+          this._info.textContent += 'Black in Check\r\n';
+          break;
+        }
+        case StateInfoOptions.crossCheck: {
+          this._info.textContent += 'Cross Check\r\n';
+          break;
+        }
+        case StateInfoOptions.whiteCheckmate: {
+          this._info.textContent += 'White Checkmate\r\n';
+          break;
+        }
+        case StateInfoOptions.blackCheckmate: {
+          this._info.textContent += 'Black Checkmate\r\n';
+          break;
+        }
+        case StateInfoOptions.draw: {
+          this._info.textContent += 'Draw\r\n';
+          break;
+        }
+        case StateInfoOptions.stalemate: {
+          this._info.textContent += 'Stalemate\r\n';
           break;
         }
         default: {
-          this._info.textContent += 'Invalid State Info <br/>';
+          this._info.textContent += 'Invalid State Info \r\n';
           break;
         }
       }
