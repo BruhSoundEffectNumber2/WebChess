@@ -90,7 +90,8 @@ export class ChessInput {
           if (
             checkResult == false ||
             ((checkResult == PieceSide.white ||
-            checkResult == PieceSide.black) && checkResult != State.get().ourPlayer)
+              checkResult == PieceSide.black) &&
+              checkResult != State.get().ourPlayer)
           ) {
             this.legalMoves.push(move);
           }
