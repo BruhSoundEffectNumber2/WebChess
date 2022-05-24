@@ -124,6 +124,10 @@ export class State {
       // FIXME: Cannot handle results of function
       if (isCheck == undefined) {
         return false;
+      } else if (isCheck == PieceSide.white || isCheck == PieceSide.black) {
+        if (isCheck != ourColor) {
+          return false;
+        }
       }
     }
 
