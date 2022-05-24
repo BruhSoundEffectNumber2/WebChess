@@ -49,12 +49,14 @@ $palette-imperialRed: hsl(352, 93, 53);
 }
 
 /* Root UI */
-body {
+html, body {
   font: 100% $font-stack;
   margin: 0;
   padding: 0;
   background-color: $palette-eerieBlack;
   color: $palette-alabaster;
+  width: 100vw;
+  height: 100vh;
 }
 
 footer {
@@ -71,20 +73,19 @@ footer {
 }
 
 div#root {
-  display: grid;
-  width: 100vw;
-  height: 100vh;
-  grid-template-columns: [le] 100% [re];
-  grid-template-rows: [le] 10% [cte] 80% [cbe] 10% [be];
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+
 
   div#game-container {
-    margin: auto;
+    aspect-ratio: 1.5;
+    align-self: center;
     position: relative;
-    grid-column: 1;
-    grid-row: 2;
     display: grid;
-    height: 100%;
-    width: 100%;
+    height: 90%;
+    width: 90%;
     grid-template-columns: [le] 100% [re];
     grid-template-rows: [te] 100% [be];
   
