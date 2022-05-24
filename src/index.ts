@@ -18,11 +18,11 @@ export class Game extends Engine {
     super({
       canvasElementId: 'game',
       pointerScope: Input.PointerScope.Document,
-      // Set the native resolution and allow CSS to set the canvas size
-      resolution: {width: 900, height: 600},
       suppressPlayButton: true,
       suppressConsoleBootMessage: true,
-      displayMode: DisplayMode.FitContainer,
+      displayMode: DisplayMode.Fixed,
+      width: 900,
+      height: 600,
     });
   }
 
