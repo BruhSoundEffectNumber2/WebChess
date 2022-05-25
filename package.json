@@ -1,6 +1,6 @@
 {
   "name": "webchess",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "private": true,
   "description": "A web-based chess game built using Excalibur and Typescript",
   "main": "index.js",

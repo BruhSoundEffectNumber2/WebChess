@@ -160,7 +160,7 @@ export class Network {
   }
 
   public sendMatchEnd(victor: number) {
-    this._socket.emit('matchEnd', victor);
+    this._socket.emit('matchEnd', this._match, victor);
   }
 
   private matched(match: string, ourPlayer: number) {

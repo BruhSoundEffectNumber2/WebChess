@@ -3,7 +3,7 @@ import {Server, Socket} from 'socket.io';
 import {v4 as uuidv4} from 'uuid';
 
 /* The server and app versions must match exactly, else a wrongVersion error will occur. */
-const serverVersion = '0.1.2';
+const serverVersion = '0.2.0';
 
 class Player {
   public matched = false;

@@ -3,6 +3,9 @@ import {BoardState} from './boardState';
 import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
 import {Board} from '../scenes/board';
+import {Network} from './network';
+import {UIManager} from '../ui/uiManager';
+import { Game } from '..';
 
 /**
  * Contains the various actions that can happen during a the end of a turn,
@@ -90,15 +93,34 @@ export class State {
       }
 
       // Checkmate
-      // TODO: Have this actually end the game
       if (this.inCheckmate(this._boardState, PieceSide.white)) {
         state.push(StateInfoOptions.whiteCheckmate);
+        this.checkmateResult(PieceSide.black);
       } else if (this.inCheckmate(this._boardState, PieceSide.black)) {
         state.push(StateInfoOptions.blackCheckmate);
+        this.checkmateResult(PieceSide.white);
       }
     }
 
     Board.get().updateInfo(state);
+  }
+
+  /**
+   * Called when a checkmate happens. Handles sending win to server.
+   */
+  checkmateResult(victor: PieceSide): void {
+    Network.get().sendMatchEnd(victor);
+    const youWon = victor == this._ourPlayer;
+
+    UIManager.get().alertPopup(
+      youWon ? 'You Won!' : 'You Lost',
+      youWon
+        ? 'Congrats! You won the game. Great job.'
+        : 'Sorry, looks like your opponent bested you. You\'ll get them next time',
+      () => {
+        Game.get().returnToMenu();
+      }
+    );
   }
 
   inCheckmate(state: BoardState, ourColor: PieceSide): boolean {

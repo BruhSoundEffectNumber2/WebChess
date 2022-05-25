@@ -3,7 +3,6 @@ import {Game} from '..';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
-import {PieceSide} from '../helper/piece';
 import {Network} from '../state/network';
 import {State, StateInfoOptions} from '../state/state';
 import {UIManager} from '../ui/uiManager';

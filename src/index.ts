@@ -3,7 +3,7 @@ import './styles/main.scss';
 import './styles/mainMenu.scss';
 import './styles/board.scss';
 
-import {DisplayMode, Engine, Input, Loader, ScrollPreventionMode} from 'excalibur';
+import {DisplayMode, Engine, Input, Loader} from 'excalibur';
 import {ChessInput} from './input/chessInput';
 import {Resources} from './resources';
 import {Board} from './scenes/board';
