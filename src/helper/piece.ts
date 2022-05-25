@@ -50,8 +50,11 @@ export class Piece {
     if (pos.x >= 0 && pos.x <= 7) {
       if (pos.y >= 0 && pos.y <= 7) {
         this._pos = pos;
+        return;
       }
     }
+
+    console.warn('Tried to set the position of a piece to an invalid value.');
   }
 
   static getLegalMoves(board: BoardState, pos: Vector): Move[] {

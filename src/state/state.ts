@@ -2,7 +2,27 @@ import {vec} from 'excalibur';
 import {BoardState} from './boardState';
 import {Move} from '../helper/move';
 import {Piece, PieceSide, PieceType} from '../helper/piece';
-import { Board } from '../scenes/board';
+import {Board} from '../scenes/board';
+import {Network} from './network';
+import {UIManager} from '../ui/uiManager';
+import { Game } from '..';
+
+/**
+ * Contains the various actions that can happen during a the end of a turn,
+ * such as a check, checkmate, draw, or other important event. Only for
+ * displaying the current state of the game to the user.
+ */
+export enum StateInfoOptions {
+  whiteMove,
+  blackMove,
+  whiteCheck,
+  blackCheck,
+  crossCheck,
+  whiteCheckmate,
+  blackCheckmate,
+  draw,
+  stalemate,
+}
 
 export class State {
   private static _state: State | undefined = undefined;
@@ -46,8 +66,16 @@ export class State {
   }
 
   turnMade(): void {
+    const state: StateInfoOptions[] = [];
+
     this._playerTurn =
       this._playerTurn == PieceSide.white ? PieceSide.black : PieceSide.white;
+
+    if (this._playerTurn == PieceSide.white) {
+      state.push(StateInfoOptions.whiteMove);
+    } else {
+      state.push(StateInfoOptions.blackMove);
+    }
 
     this._turnCount++;
 
@@ -55,20 +83,44 @@ export class State {
 
     this._check = this.kingInCheck(this._boardState);
     if (this._check != undefined) {
-      if (this._check == true) {
-        if (this.inCheckmate(this._boardState, PieceSide.white)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
+      // Check
+      if (this._check == PieceSide.white) {
+        state.push(StateInfoOptions.whiteCheck);
+      } else if (this._check == PieceSide.black) {
+        state.push(StateInfoOptions.blackCheck);
+      } else if (this._check == true) {
+        state.push(StateInfoOptions.crossCheck);
+      }
 
-        if (this.inCheckmate(this._boardState, PieceSide.black)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
-      } else {
-        if (this.inCheckmate(this._boardState, this._check as PieceSide)) {
-          console.log(this._check + ' in checkmate. Game over.');
-        }
+      // Checkmate
+      if (this.inCheckmate(this._boardState, PieceSide.white)) {
+        state.push(StateInfoOptions.whiteCheckmate);
+        this.checkmateResult(PieceSide.black);
+      } else if (this.inCheckmate(this._boardState, PieceSide.black)) {
+        state.push(StateInfoOptions.blackCheckmate);
+        this.checkmateResult(PieceSide.white);
       }
     }
+
+    Board.get().updateInfo(state);
+  }
+
+  /**
+   * Called when a checkmate happens. Handles sending win to server.
+   */
+  checkmateResult(victor: PieceSide): void {
+    Network.get().sendMatchEnd(victor);
+    const youWon = victor == this._ourPlayer;
+
+    UIManager.get().alertPopup(
+      youWon ? 'You Won!' : 'You Lost',
+      youWon
+        ? 'Congrats! You won the game. Great job.'
+        : 'Sorry, looks like your opponent bested you. You\'ll get them next time',
+      () => {
+        Game.get().returnToMenu();
+      }
+    );
   }
 
   inCheckmate(state: BoardState, ourColor: PieceSide): boolean {
@@ -77,19 +129,27 @@ export class State {
 
     for (let x = 0; x < 8; x++) {
       for (let y = 0; y < 8; y++) {
-        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
         const piece = state.getPiece(vec(x, y));
 
-        if (piece && piece.side == ourColor) {
-          ourLegalMoves.push(...legalMoves);
+        if (piece == null || piece.side != ourColor) {
+          continue;
         }
+
+        const legalMoves = Piece.getLegalMoves(state, vec(x, y));
+        ourLegalMoves.push(...legalMoves);
       }
     }
 
     // If there is even one possible move to get us out of check, we are not in checkmate
     for (const ourMove of ourLegalMoves) {
-      if (!this.kingInCheckWithMove(state, ourMove)) {
+      const isCheck = this.kingInCheckWithMove(state, ourMove);
+      // FIXME: Cannot handle results of function
+      if (isCheck == undefined) {
         return false;
+      } else if (isCheck == PieceSide.white || isCheck == PieceSide.black) {
+        if (isCheck != ourColor) {
+          return false;
+        }
       }
     }
 
@@ -109,18 +169,17 @@ export class State {
       }
     }
 
-    let whiteCheck;
-    let blackCheck;
+    let whiteCheck = false;
+    let blackCheck = false;
 
     for (const move of allLegalMoves) {
-      whiteCheck = false;
-      blackCheck = false;
-
       if (move.end.equals(whiteKingPos)) {
         // Make sure the black king isn't the one checking the white king
         if (
-          move.piece.side != PieceSide.black &&
-          move.piece.type != PieceType.king
+          !(
+            move.piece.side != PieceSide.black &&
+            move.piece.type != PieceType.king
+          )
         ) {
           whiteCheck = true;
         }
@@ -129,8 +188,10 @@ export class State {
       if (move.end.equals(blackKingPos)) {
         // Make sure the white king isn't the one checking the black king
         if (
-          move.piece.side != PieceSide.white &&
-          move.piece.type != PieceType.king
+          !(
+            move.piece.side != PieceSide.white &&
+            move.piece.type != PieceType.king
+          )
         ) {
           blackCheck = true;
         }
@@ -146,12 +207,14 @@ export class State {
     }
   }
 
-  kingInCheckWithMove(state: BoardState, possibleMove: Move): boolean {
+  kingInCheckWithMove(
+    state: BoardState,
+    possibleMove: Move,
+  ): boolean | PieceSide {
     const newState = new BoardState(state);
     newState.movePiece(possibleMove);
 
     const kingCheckResult = this.kingInCheck(newState);
-    const ourColor = possibleMove.piece.side;
 
     if (kingCheckResult == true) {
       return true;
@@ -159,7 +222,7 @@ export class State {
       kingCheckResult == PieceSide.black ||
       kingCheckResult == PieceSide.white
     ) {
-      return kingCheckResult == ourColor;
+      return kingCheckResult;
     } else {
       return false;
     }
@@ -167,11 +230,11 @@ export class State {
 
   // Singleton creation and getting
   static init(ourPlayer: PieceSide): void {
-    if (this._state) {
-      throw new Error('Cannot create the state more than once.');
-    }
-
     this._state = new State(ourPlayer);
+  }
+
+  static stateInitialized(): boolean {
+    return this._state != undefined;
   }
 
   static get(): State {

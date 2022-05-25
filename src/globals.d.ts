@@ -1,4 +1,7 @@
-/* eslint-disable */
 declare module '*.png';
-declare module '*.svg';
+declare module '*.ogg';
+declare module 'uuid';
+
+/* Webpack Define Plugin Variables */
 declare const __ServerAddress__: string;
+declare const __AppVersion__: string;

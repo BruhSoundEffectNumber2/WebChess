@@ -1,8 +1,11 @@
 import {Actor, Color, Rectangle, Scene, vec, Vector} from 'excalibur';
+import {Game} from '..';
 import {MoveLocationActor} from '../actors/moveLocationActor';
 import {PieceActor} from '../actors/pieceActor';
 import {Move} from '../helper/move';
-import {State} from '../state/state';
+import {Network} from '../state/network';
+import {State, StateInfoOptions} from '../state/state';
+import {UIManager} from '../ui/uiManager';
 
 export class Board extends Scene {
   static _board: Board | undefined = undefined;
@@ -10,7 +13,11 @@ export class Board extends Scene {
   private pieceActors!: PieceActor[];
   private moveLocationActors!: MoveLocationActor[];
 
-  override onInitialize(): void {
+  private _info!: HTMLParagraphElement;
+
+  override onActivate(): void {
+    UIManager.get().sceneActivated('board');
+
     // Rectangles for the board squares
     const lightSquare = new Rectangle({
       width: 75,
@@ -41,10 +48,57 @@ export class Board extends Scene {
       }
     }
 
+    // Create UI elements
+    const bg = document.createElement('div');
+    bg.className = 'bg';
+
+    this._info = document.createElement('p');
+    this._info.className = 'info';
+    this._info.textContent = 'Default Text Content';
+
+    const buttonHolder = document.createElement('div');
+    buttonHolder.className = 'button-holder';
+
+    const surrender = document.createElement('button');
+    surrender.className = 'surrender';
+    surrender.textContent = 'Surrender';
+    surrender.onclick = () => {
+      UIManager.get().decisionPopup(
+        'Are You Sure?',
+        'Are you sure you want to surrender? The match will count as a loss.',
+        'Go Back',
+        () => {
+          /* Don't surrender */
+        },
+        'Surrender',
+        () => {
+          Network.get().surrender();
+        },
+      );
+    };
+
+    const offerDraw = document.createElement('button');
+    offerDraw.className = 'offerDraw';
+    offerDraw.textContent = 'Offer Draw';
+    offerDraw.onclick = () => {
+      UIManager.get().playButtonClickAudio();
+      Network.get().offerDraw();
+    };
+
+    UIManager.get().ui.appendChild(bg);
+    bg.appendChild(this._info);
+    bg.appendChild(buttonHolder);
+    buttonHolder.appendChild(surrender);
+    buttonHolder.appendChild(offerDraw);
+
     this.pieceActors = [];
     this.moveLocationActors = [];
 
     this.resetPieceActors();
+  }
+
+  override onDeactivate(): void {
+    UIManager.get().sceneDeactivated('board');
   }
 
   resetPieceActors(): void {
@@ -89,11 +143,74 @@ export class Board extends Scene {
     });
   }
 
+  updateInfo(stateEnums: StateInfoOptions[]): void {
+    this._info.textContent = '';
+
+    for (const state of stateEnums) {
+      // For the players sake, tell them that THEY need to move, not just the color
+      this._info.textContent +=
+        State.get().ourPlayer == State.get().playerTurn
+          ? '(You) '
+          : '(Opponent) ';
+
+      switch (state) {
+        case StateInfoOptions.whiteMove: {
+          this._info.textContent += 'White to Move\r\n';
+          break;
+        }
+        case StateInfoOptions.blackMove: {
+          this._info.textContent += 'Black to Move\r\n';
+          break;
+        }
+        case StateInfoOptions.whiteCheck: {
+          this._info.textContent += 'White in Check\r\n';
+          break;
+        }
+        case StateInfoOptions.blackCheck: {
+          this._info.textContent += 'Black in Check\r\n';
+          break;
+        }
+        case StateInfoOptions.crossCheck: {
+          this._info.textContent += 'Cross Check\r\n';
+          break;
+        }
+        case StateInfoOptions.whiteCheckmate: {
+          this._info.textContent += 'White Checkmate\r\n';
+          break;
+        }
+        case StateInfoOptions.blackCheckmate: {
+          this._info.textContent += 'Black Checkmate\r\n';
+          break;
+        }
+        case StateInfoOptions.draw: {
+          this._info.textContent += 'Draw\r\n';
+          break;
+        }
+        case StateInfoOptions.stalemate: {
+          this._info.textContent += 'Stalemate\r\n';
+          break;
+        }
+        default: {
+          this._info.textContent += 'Invalid State Info \r\n';
+          break;
+        }
+      }
+    }
+  }
+
   static get(): Board {
     if (this._board == undefined) {
       this._board = new Board();
     }
 
     return this._board;
+  }
+
+  static destroy(): void {
+    if (Game.get().scenes['board'] == undefined) {
+      return;
+    }
+
+    Game.get().removeScene('board');
   }
 }

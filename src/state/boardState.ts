@@ -9,8 +9,8 @@ export class BoardState {
     ['br', 'bp', '', '', '', '', 'wp', 'wr'],
     ['bn', 'bp', '', '', '', '', 'wp', 'wn'],
     ['bb', 'bp', '', '', '', '', 'wp', 'wb'],
-    ['bq', 'bp', '', '', '', '', 'wp', 'wk'],
-    ['bk', 'bp', '', '', '', '', 'wp', 'wq'],
+    ['bq', 'bp', '', '', '', '', 'wp', 'wq'],
+    ['bk', 'bp', '', '', '', '', 'wp', 'wk'],
     ['bb', 'bp', '', '', '', '', 'wp', 'wb'],
     ['bn', 'bp', '', '', '', '', 'wp', 'wn'],
     ['br', 'bp', '', '', '', '', 'wp', 'wr'],
@@ -28,7 +28,11 @@ export class BoardState {
           if (origPiece == null) {
             this.pieces[x]![y] = null;
           } else {
-            this.pieces[x]![y] = new Piece(origPiece.pos, origPiece.type, origPiece.side);
+            this.pieces[x]![y] = new Piece(
+              origPiece.pos,
+              origPiece.type,
+              origPiece.side,
+            );
           }
         }
       }
@@ -98,15 +102,12 @@ export class BoardState {
   }
 
   movePiece(move: Move): void {
-    const piece = this.getPiece(move.start);
-
-    // Make sure a piece is there to be moved
-    if (piece == undefined) {
-      return;
-    }
+    const piece = this.pieces[move.start.x]![move.start.y]!;
 
     this.pieces[move.start.x]![move.start.y] = null;
     this.pieces[move.end.x]![move.end.y] = piece;
+
+    piece.pos = vec(move.end.x, move.end.y);
   }
 
   getKingPos(side: PieceSide): Vector {

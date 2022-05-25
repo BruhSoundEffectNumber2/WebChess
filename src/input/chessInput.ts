@@ -1,6 +1,7 @@
 import {Input, vec} from 'excalibur';
 import {Move} from '../helper/move';
-import {Piece} from '../helper/piece';
+import {Piece, PieceSide} from '../helper/piece';
+import {playChessMovedSound} from '../resources';
 import {Board} from '../scenes/board';
 import {Network} from '../state/network';
 import {State} from '../state/state';
@@ -52,6 +53,8 @@ export class ChessInput {
           Network.get().sendMove(move);
           State.get().pieceMoved();
 
+          playChessMovedSound();
+
           this._activePiece = null;
           this.legalMoves = [];
 
@@ -79,7 +82,17 @@ export class ChessInput {
         );
 
         for (const move of possibleMoves) {
-          if (!State.get().kingInCheckWithMove(State.get().boardState, move)) {
+          const checkResult = State.get().kingInCheckWithMove(
+            State.get().boardState,
+            move,
+          );
+
+          if (
+            checkResult == false ||
+            ((checkResult == PieceSide.white ||
+              checkResult == PieceSide.black) &&
+              checkResult != State.get().ourPlayer)
+          ) {
             this.legalMoves.push(move);
           }
         }

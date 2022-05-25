@@ -1,28 +1,37 @@
 import {Scene} from 'excalibur';
-import { Network } from '../state/network';
-import { UIManager } from '../ui/uiManager';
+import {Network} from '../state/network';
+import {UIManager} from '../ui/uiManager';
 
 export class MainMenu extends Scene {
+  private _startButton: HTMLButtonElement | undefined;
+
   override onActivate() {
     UIManager.get().sceneActivated('mainMenu');
 
-    const startButton = document.createElement('button');
+    this._startButton = document.createElement('button');
 
-    startButton.className = 'button--start';
-    startButton.textContent = 'Find Match';
+    this._startButton.className = 'button--start';
+    this._startButton.textContent = 'Find Match';
 
-    startButton.onclick = (e) => {
+    this._startButton.onclick = (e) => {
       e.preventDefault();
 
+      UIManager.get().playButtonClickAudio();
+      Network.get().connect();
       Network.get().startMatchmaking();
-      startButton.textContent = 'Finding Match';
-      startButton.disabled = true;
+      this._startButton!.textContent = 'Finding Match';
+      this._startButton!.disabled = true;
     };
 
-    UIManager.get().ui.appendChild(startButton);
+    UIManager.get().ui.appendChild(this._startButton);
+  }
+
+  reset() {
+    this._startButton!.textContent = 'Find Match';
+    this._startButton!.disabled = false;
   }
 
   override onDeactivate(): void {
-    UIManager.get().sceneDeactivated();
+    UIManager.get().sceneDeactivated('mainMenu');
   }
 }

@@ -1,0 +1,42 @@
+@use './main' as *;
+
+div#ui.board div.bg {
+  background-color: $palette-eerieBlack;
+  position: absolute;
+  top: 1px;
+  left: 601px;
+  width: 300px;
+  height: 600px;
+  white-space: pre;
+
+  /* Grid Properties */
+  display: grid;
+  grid-template-columns: [first] 100%;
+  grid-template-rows: [row1] 50% [row2] 50%;
+
+  p.info {
+    font: 125% $font-stack;
+    text-align: center;
+    margin: 2%;
+  }
+
+  div.button-holder {
+    display: grid;
+    grid-template-columns: [first] 100%;
+    grid-template-rows: [dummy] auto [first] 20% [second] 20%;
+
+    button {
+      @include button-base();
+
+      margin: 2% 5%;
+
+      &.surrender {
+        grid-row: 2;
+      }
+
+      &.offerDraw {
+        grid-row: 3;
+      }
+    }
+  }
+}

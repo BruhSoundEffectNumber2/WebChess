@@ -1,48 +1,137 @@
 $font-stack: Helvetica, sans-serif;
-$background1: rgb(45, 45, 45);
-$background2: rgb(30, 30, 30);
-$game-width: 900px;
-$game-height: 600px;
+$transition-short: 100ms;
 
-body {
-  font: 100% $font-stack;
-  color: aliceblue;
-  background-color: $background1;
-  padding: 0;
-}
+/* Color Palette */
+$palette-jet: hsl(120, 2, 20);
+$palette-eerieBlack: hsl(60, 1, 14);
+$palette-maizeCrayola: hsl(44, 88, 66);
+$palette-alabaster: hsl(81, 28, 90);
+$palette-gainsboro: hsl(150, 14, 84);
+$palette-imperialRed: hsl(352, 93, 53);
 
-.game-name {
-  padding: 0;
-  font-size: 24pt;
-}
-
-#root {
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#root #ui {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: $game-width;
-  height: $game-height;
-}
-
-div#ui.mainMenu button.button--start {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+/* Global Mixins */
+@mixin absolute-centered {
   transform: translate(-50%, -50%);
-  background: $background1;
-  color: aliceblue;
-  border-width: 1px;
-  width: 140px;
-  height: 40px;
-  transition-duration: 100ms;
+  position: absolute;
 }
 
-div#ui.mainMenu button.button--start:hover {
-  background: $background2;
+@mixin position-center {
+  left: 50%;
+  top: 50%;
+}
+
+@mixin border-rounded {
+  border-radius: 0.25rem;
+  border: 1px solid $palette-alabaster;
+}
+
+@mixin button-base {
+  @include border-rounded();
+
+  font: 100% $font-stack;
+  padding: 0.5rem;
+  color: $palette-eerieBlack;
+  border-color: $palette-eerieBlack;
+  transition-duration: $transition-short;
+  background-color: $palette-alabaster;
+  box-shadow: 2px 2px 2px transparentize($palette-eerieBlack, 0.7%);
+
+  &:hover:enabled {
+    background-color: $palette-maizeCrayola;
+  }
+
+  &:disabled {
+    background-color: desaturate($palette-maizeCrayola, 50%);
+  }
+}
+
+@mixin popup {
+}
+
+/* Root UI */
+html, body {
+  font: 100% $font-stack;
+  margin: 0;
+  padding: 0;
+  background-color: $palette-eerieBlack;
+  color: $palette-alabaster;
+  width: 100%;
+  height: 100%;
+}
+
+div#root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+
+  div#game-container {
+    align-self: center;
+    position: relative;
+    display: grid;
+    width: 900px;
+    height: 600px;
+    grid-template-columns: [le] 100% [re];
+    grid-template-rows: [te] 100% [be];
+  
+    /* Allows the window and ui to be centered together. */
+    canvas#game {
+      @include border-rounded();
+  
+      grid-column: 1;
+      grid-row: 1;
+      position: relative;
+    }
+  
+    div#ui {
+      grid-column: 1;
+      grid-row: 1;
+      position: relative;
+    }
+  }
+}
+
+/* Popups */
+div.popup {
+  @include absolute-centered();
+  @include position-center();
+  @include border-rounded();
+
+  width: 25%;
+  height: 35%;
+  background-color: $palette-eerieBlack;
+
+  p.header {
+    margin: 0;
+    padding: 2%;
+    font-size: 140%;
+    height: 13%;
+
+    &--error {
+      @extend .header;
+      color: $palette-imperialRed;
+    }
+  }
+
+  p.body {
+    margin: 0;
+    padding: 2%;
+    border-top: 2px solid $palette-alabaster;
+    border-bottom: 2px solid $palette-alabaster;
+    height: 60%;
+  }
+
+  div.options-holder {
+    display: flex;
+    justify-content: space-around;
+    height: 17%;
+
+    button.option {
+      @include button-base();
+
+      flex-grow: 1;
+      margin: 1.5% 1%;
+    }
+  }
 }

@@ -3,6 +3,7 @@ import {io, Socket} from 'socket.io-client';
 import {Game} from '..';
 import {Move} from '../helper/move';
 import {Piece} from '../helper/piece';
+import {UIManager} from '../ui/uiManager';
 import {State} from './state';
 
 export class Network {
@@ -10,12 +11,40 @@ export class Network {
 
   private _socket!: Socket;
   private _match!: string;
+  private _connectionAttempts = 0;
+  // How many times will the socket try to connect before giving up
+  private readonly maxConnectionAttempts = 3;
+
+  disconnect() {
+    this._socket.disconnect();
+  }
 
   connect() {
-    this._socket = io(__ServerAddress__);
+    this._socket = io(__ServerAddress__, {query: {version: __AppVersion__}});
 
     this._socket.on('connect', () => {
       console.log('Connected to server.');
+    });
+
+    this._socket.on('connect_error', (err) => {
+      this._connectionAttempts++;
+      console.log('Could not connect due to %s', err.message);
+
+      if (this._connectionAttempts >= this.maxConnectionAttempts) {
+        console.log(
+          'We have been unable to connect to the server, disconnecting socket...',
+        );
+
+        UIManager.get().errorPopup(
+          'Connection Error',
+          'There was an error when connecting to the server, and all retry attempts failed.',
+          () => {
+            Game.get().returnToMenu();
+          },
+        );
+        this._socket.disconnect();
+        this._connectionAttempts = 0;
+      }
     });
 
     this._socket.on('disconnect', () => {
@@ -24,6 +53,16 @@ export class Network {
 
     this._socket.on('matched', (match: string, ourPlayer: number) => {
       this.matched(match, ourPlayer);
+    });
+
+    this._socket.on('matchError', () => {
+      UIManager.get().errorPopup(
+        'Match Error',
+        'An unexpected error has occurred and the match is unable to continue. The match will now end.',
+        () => {
+          this.endMatch();
+        },
+      );
     });
 
     this._socket.on('move', (move) => {
@@ -40,31 +79,88 @@ export class Network {
         ),
       );
     });
+
+    this._socket.on('surrender', () => {
+      UIManager.get().alertPopup(
+        'Surrender',
+        'Your opponent has decided to surrender. The match will now end.',
+        () => {
+          this.endMatch();
+        },
+      );
+    });
+
+    this._socket.on('offerDraw', () => {
+      UIManager.get().decisionPopup(
+        'Draw Offered',
+        'Your opponent has offered a draw. You can choose to accept or reject it.',
+        'Accept',
+        () => {
+          this._socket.emit('drawAccepted', this._match);
+          this.endMatch();
+        },
+        'Reject',
+        () => {
+          this._socket.emit('drawRejected', this._match);
+        },
+      );
+    });
+
+    this._socket.on('drawAccepted', () => {
+      UIManager.get().alertPopup(
+        'Draw Accepted',
+        'Your opponent has agreed to draw. The match will now end.',
+        () => {
+          this.endMatch();
+        },
+      );
+    });
+
+    this._socket.on('drawRejected', () => {
+      UIManager.get().alertPopup(
+        'Draw Rejected',
+        'Your opponent has not agreed to draw. The match will continue.',
+      );
+    });
+
+    this._socket.on('wrongVersion', () => {
+      UIManager.get().errorPopup(
+        'Wrong Version',
+        `The game and the server are on different versions and cannot connect. 
+        Try waiting and refreshing the page to get the updated version.`,
+        () => {
+          Game.get().returnToMenu();
+        },
+      );
+    });
   }
 
   sendMove(move: Move) {
-    if (!this._socket.connected) {
-      console.warn('Trying to move when not connected.');
-    }
-
     this._socket.emit('move', this._match, move);
   }
 
-  private receiveMove(move: Move) {
-    console.log('Received move');
+  offerDraw(): void {
+    this._socket.emit('offerDraw', this._match);
+  }
 
+  surrender(): void {
+    this._socket.emit('surrender', this._match);
+    this.endMatch();
+  }
+
+  private receiveMove(move: Move) {
     State.get().boardState.movePiece(move);
     State.get().pieceMoved();
   }
 
   startMatchmaking() {
-    if (!this._socket.connected) {
-      console.warn('Trying to match when not connected.');
-    }
-
     console.log('Starting matchmaking');
 
     this._socket.emit('match');
+  }
+
+  public sendMatchEnd(victor: number) {
+    this._socket.emit('matchEnd', this._match, victor);
   }
 
   private matched(match: string, ourPlayer: number) {
@@ -72,6 +168,11 @@ export class Network {
 
     this._match = match;
     Game.get().startGame(ourPlayer);
+  }
+
+  private endMatch() {
+    Game.get().returnToMenu();
+    this.disconnect();
   }
 
   static get(): Network {
